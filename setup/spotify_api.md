@@ -21,7 +21,7 @@
         - your_client_id:your_client_secret<br>
         - You can convert this by going to [base64encode.org] (https://www.base64encode.org/), pasting in the string like in the example above, and then clicking encode. Ensure encode is selected and not decode.<br>
         - Curl command:<br>
-            -curl -d client_id=your_client_id -d client_secret=your_client_secret -d grant_type=authorization_code -d code=authorization_code_obtained_from_step_4 -d redirect_uri=your_redirect_uri https://accounts.spotify.com/api/token<br>
+        -curl -d client_id=your_client_id -d client_secret=your_client_secret -d grant_type=authorization_code -d code=authorization_code_obtained_from_step_4 -d redirect_uri=your_redirect_uri https://accounts.spotify.com/api/token<br>
 6. Run curl command to obtain access token and refresh token
     <p>- Paste in the curl command from step 5 into command prompt/terminal and run<br>
     - Save your access token and refresh token<br>
