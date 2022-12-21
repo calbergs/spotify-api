@@ -1,5 +1,5 @@
 """
-Generates a new refresh token on each run
+Generates a new access token on each run
 """
 
 import requests
