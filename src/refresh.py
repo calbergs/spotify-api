@@ -27,5 +27,6 @@ class Refresh:
         response_json = response.json()
         return response_json["access_token"]
 
-new_token = Refresh()
-new_token.refresh()
+if __name__ == "__main__":
+    new_token = Refresh()
+    new_token.refresh()

@@ -131,5 +131,6 @@ class RetrieveSongs:
         print("Getting songs...")
         self.get_songs()
 
-tracks = RetrieveSongs()
-tracks.call_refresh()
+if __name__ == "__main__":
+    tracks = RetrieveSongs()
+    tracks.call_refresh()
