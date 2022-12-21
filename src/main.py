@@ -29,7 +29,7 @@ class RetrieveSongs:
         yesterday_unix_timestamp = int(yesterday.timestamp()) * 1000
 
         # Download all songs listened to in the past 24 hours
-        song_response = requests.get("https://api.spotify.com/v1/me/player/recently-played?limit=50&offset=0&after={time}".format(time=yesterday_unix_timestamp), headers = headers)
+        song_response = requests.get("https://api.spotify.com/v1/me/player/recently-played?limit=50&after={time}".format(time=yesterday_unix_timestamp), headers = headers)
 
         song_data = song_response.json()
 
