@@ -28,7 +28,7 @@ class RetrieveSongs:
         yesterday = today - datetime.timedelta(days=1)
         yesterday_unix_timestamp = int(yesterday.timestamp()) * 1000
 
-        # Download all songs you've listened to "after yesterday", which means in the last 24 hours
+        # Download all songs listened to in the past 24 hours
         song_response = requests.get("https://api.spotify.com/v1/me/player/recently-played?limit=50&offset=0&after={time}".format(time=yesterday_unix_timestamp), headers = headers)
 
         song_data = song_response.json()
@@ -44,7 +44,7 @@ class RetrieveSongs:
         album_ids = []
         artist_ids = []
 
-        # Extract only the data we need from the json object
+        # Extract only the necessary data from the json object
         for song in song_data["items"]:
             played_at_utc.append(song["played_at"])
             played_date_utc.append(song["played_at"][0:10])
