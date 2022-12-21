@@ -2,7 +2,6 @@
 Makes requests to the Spotify API to retrieve recently played songs and the corresponding genres
 """
 
-import csv
 import datetime
 import json
 import pandas as pd
