@@ -7,7 +7,6 @@ import json
 from secrets import refresh_token, base_64
 
 class Refresh:
-
     def __init__(self):
         self.refresh_token = refresh_token
         self.base_64 = base_64
