@@ -37,7 +37,7 @@ class RetrieveSongs:
         played_date_utc = []
         song_names = []
         artist_names = []
-        song_durations = []
+        song_durations_ms = []
         song_links = []
         album_art_links = []
         album_names = []
@@ -51,7 +51,7 @@ class RetrieveSongs:
             played_date_utc.append(song["played_at"][0:10])
             song_names.append(song["track"]["name"])
             artist_names.append(song["track"]["album"]["artists"][0]["name"])
-            song_durations.append(song["track"]["duration_ms"])
+            song_durations_ms.append(song["track"]["duration_ms"])
             song_links.append(song["track"]["external_urls"]["spotify"])
             album_art_links.append(song["track"]["album"]["images"][1]["url"])
             album_names.append(song["track"]["album"]["name"])
@@ -65,7 +65,7 @@ class RetrieveSongs:
             "played_date_utc" : played_date_utc,
             "song_name" : song_names,
             "artist_name": artist_names,
-            "song_duration": song_durations,
+            "song_duration_ms": song_durations_ms,
             "song_link": song_links,
             "album_art_link": album_art_links,
             "album_name": album_names,
