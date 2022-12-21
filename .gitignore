@@ -1,0 +1,4 @@
+venv/
+steps.txt
+secrets.py
+.DS_Store
