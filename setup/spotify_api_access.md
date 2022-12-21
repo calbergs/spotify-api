@@ -18,7 +18,7 @@
 5. Define your curl command
     <p>- Ensure you have curl by opening up command prompt/terminal and typing curl.<br>
         - Curl command:<br>
-        -curl -d client_id=your_client_id -d client_secret=your_client_secret -d grant_type=authorization_code -d code=authorization_code_obtained_from_step_4 -d redirect_uri=your_redirect_uri https://accounts.spotify.com/api/token<br>
+        -curl -d client_id=your_client_id -d client_secret=your_client_secret -d grant_type=authorization_code -d code=your_authorization_code_obtained_from_step_4 -d redirect_uri=your_redirect_uri https://accounts.spotify.com/api/token<br>
 6. Run curl command to obtain access token and refresh token
     <p>- Paste in the curl command from step 5 into command prompt/terminal and run<br>
     - Save your access token and refresh token<br>
