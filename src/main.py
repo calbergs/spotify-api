@@ -79,7 +79,7 @@ class RetrieveSongs:
             "played_date_utc",
             "song_name",
             "artist_name",
-            "song_duration",
+            "song_duration_ms",
             "song_link",
             "album_art_link",
             "album_name",
