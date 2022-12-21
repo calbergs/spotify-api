@@ -7,7 +7,7 @@
     - Click on **EDIT SETTINGS** and provide a redirect URI and then click save<br>
     - Copy and save your Client ID and Client Secret<br>
 3. Define your query parameters for the GET request
-    <p>https://accounts.spotify.com/authorize?client_id=your_client_id&response_type=code&redirect_uri=your_redirect_uri&scope=your_scope<br>
+    <p>- Link: https://accounts.spotify.com/authorize?client_id=your_client_id&response_type=code&redirect_uri=your_redirect_uri&scope=your_scope<br>
     - your_client_id = The Client ID saved from step 2 above<br>
     - your_redirect_uri = The redirect URI you provided in step 2 above. This needs to be the ENCODED redirect URI. You can encode the redirect URI by going to [urlencoder.org] (https://www.urlencoder.org/), pasting in the redirect URI, and then clicking encode. Ensure encode is selected and not decode.<br>
     - your_scope = Scope(s) needed for your requests. In this case we are using user-read-recently-played.<br>
