@@ -88,7 +88,7 @@ class RetrieveSongs:
             "artist_id"
         ])
 
-        song_df.to_csv('/opt/airflow/dags/data_files/spotify_songs.csv', index=False)
+        song_df.to_csv('/opt/airflow/dags/spotify_data/spotify_songs.csv', index=False)
 
         # Retrieve the corresponding genres for the artists in the artist_ids list
         artist_ids_genres = []
@@ -122,7 +122,7 @@ class RetrieveSongs:
             "artist_genre"
         ])
 
-        artist_genre_df.to_csv('/opt/airflow/dags/data_files/spotify_genres.csv', index=False)
+        artist_genre_df.to_csv('/opt/airflow/dags/spotify_data/spotify_genres.csv', index=False)
 
     def call_refresh(self):
         print("Refreshing token...")
