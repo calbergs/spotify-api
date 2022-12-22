@@ -7,5 +7,5 @@ secrets.py
 
 # Airflow
 **/logs/*
-**/dags/data_files/
+**/dags/spotify_data/
 test_dag.py
