@@ -3,3 +3,7 @@ venv/
 steps.txt
 secrets.py
 .DS_Store
+**/*.env
+
+# Airflow
+**/logs/*
