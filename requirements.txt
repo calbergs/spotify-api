@@ -1,2 +1,3 @@
 pandas
+psycopg2
 requests
