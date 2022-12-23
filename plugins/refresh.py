@@ -2,8 +2,8 @@
 Generates a new access token on each run
 """
 
-import requests
 import json
+import requests
 from secrets import refresh_token, base_64
 
 class Refresh:
