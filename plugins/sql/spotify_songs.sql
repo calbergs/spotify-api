@@ -1,5 +1,4 @@
 SELECT
-	count(played_at_utc) over () as total_records,
 	last_updated_datetime_utc at time zone 'utc' at time zone 'cst' as last_updated_datetime_cst,
 	played_at_utc at time zone 'utc' at time zone 'cst' as played_at_cst,
 	song_name,
