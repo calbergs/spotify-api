@@ -8,7 +8,7 @@ import pandas as pd
 import psycopg2
 import requests
 from refresh import Refresh
-from secrets import spotify_user_id, pg_user, pg_password
+from secrets import spotify_user_id, pg_user, pg_password, host, port, dbname
 
 class RetrieveSongs:
     def __init__(self):
@@ -20,12 +20,12 @@ class RetrieveSongs:
 
     # Query the postgres database to get the latest played timestamp
     def get_latest_listened_timestamp(self):
-        conn = psycopg2.connect(f"host='host.docker.internal' port='5432' dbname='spotify' user='{pg_user}' password='{pg_password}'")
+        conn = psycopg2.connect(f"host='{host}' port='{port}' dbname='{dbname}' user='{pg_user}' password='{pg_password}'")
         cur = conn.cursor()
 
-        postgreSQL_select_Query = "SELECT MAX(played_at_utc) FROM public.spotify_songs"
+        query = "SELECT MAX(played_at_utc) FROM public.spotify_songs"
 
-        cur.execute(postgreSQL_select_Query)
+        cur.execute(query)
         total_records = cur.rowcount
 
         max_played_at_utc = cur.fetchall()[0][0]
@@ -143,12 +143,11 @@ class RetrieveSongs:
         artist_genre_df.to_csv('/opt/airflow/dags/spotify_data/spotify_genres.csv', index=False, header=False)
 
     def load_to_postgres(self):
-        conn = psycopg2.connect(f"host='host.docker.internal' port='5432' dbname='spotify' user='{pg_user}' password='{pg_password}'")
+        conn = psycopg2.connect(f"host='{host}' port='{port}' dbname='{dbname}' user='{pg_user}' password='{pg_password}'")
         cur = conn.cursor()
 
         datasets = [
             'spotify_songs'
-            # 'spotify_genres'
         ]
 
         for dataset in datasets:
