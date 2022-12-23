@@ -42,7 +42,7 @@ class RetrieveSongs:
 
         latest_timestamp = RetrieveSongs().get_latest_listened_timestamp()
 
-        # Download all songs listened to in the past 24 hours
+        # Download all songs listened to since the last run
         song_response = requests.get("https://api.spotify.com/v1/me/player/recently-played?limit=50&after={time}".format(time=latest_timestamp), headers = headers)
 
         song_data = song_response.json()
