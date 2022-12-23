@@ -5,15 +5,32 @@ Makes requests to the Spotify API to retrieve recently played songs and the corr
 import datetime
 import json
 import pandas as pd
+import psycopg2
 import requests
 from refresh import Refresh
-from secrets import spotify_user_id
+from secrets import spotify_user_id, pg_user, pg_password
 
 class RetrieveSongs:
     def __init__(self):
         self.user_id = spotify_user_id # Spotify username
+        self.pg_user = pg_user
+        self.pg_password = pg_password
         self.spotify_token = "" # Spotify access token
         self.artists_id_dedup = "" # Deduped list of artist ids
+
+    # Query the postgres database to get the latest played timestamp
+    def get_latest_listened_timestamp(self):
+        conn = psycopg2.connect(f"host='host.docker.internal' port='5432' dbname='spotify' user='{pg_user}' password='{pg_password}'")
+        cur = conn.cursor()
+
+        postgreSQL_select_Query = "SELECT MAX(played_at_utc) FROM public.spotify_songs"
+
+        cur.execute(postgreSQL_select_Query)
+        total_records = cur.rowcount
+
+        max_played_at_utc = cur.fetchall()[0][0]
+        latest_timestamp = int(max_played_at_utc.timestamp()) * 1000
+        return latest_timestamp
 
     # Extract recently played songs from Spotify API
     def get_songs(self):
@@ -23,13 +40,10 @@ class RetrieveSongs:
             "Authorization" : "Bearer {}".format(self.spotify_token)
         }
 
-        # Convert time to Unix timestamp in miliseconds
-        today = datetime.datetime.now()
-        yesterday = today - datetime.timedelta(days=1)
-        yesterday_unix_timestamp = int(yesterday.timestamp()) * 1000
+        latest_timestamp = RetrieveSongs().get_latest_listened_timestamp()
 
         # Download all songs listened to in the past 24 hours
-        song_response = requests.get("https://api.spotify.com/v1/me/player/recently-played?limit=50&after={time}".format(time=yesterday_unix_timestamp), headers = headers)
+        song_response = requests.get("https://api.spotify.com/v1/me/player/recently-played?limit=50&after={time}".format(time=latest_timestamp), headers = headers)
 
         song_data = song_response.json()
 
@@ -88,7 +102,11 @@ class RetrieveSongs:
             "artist_id"
         ])
 
-        song_df.to_csv('/opt/airflow/dags/spotify_data/spotify_songs.csv', index=False)
+        last_updated_datetime_utc = datetime.datetime.utcnow()
+        song_df['last_updated_datetime_utc'] = last_updated_datetime_utc
+        song_df = song_df.sort_values('played_at_utc', ascending=True)
+        song_df = song_df.iloc[1: , :]
+        song_df.to_csv('/opt/airflow/dags/spotify_data/spotify_songs.csv', index=False, header=False)
 
         # Retrieve the corresponding genres for the artists in the artist_ids list
         artist_ids_genres = []
@@ -122,7 +140,24 @@ class RetrieveSongs:
             "artist_genre"
         ])
 
-        artist_genre_df.to_csv('/opt/airflow/dags/spotify_data/spotify_genres.csv', index=False)
+        artist_genre_df.to_csv('/opt/airflow/dags/spotify_data/spotify_genres.csv', index=False, header=False)
+
+    def load_to_postgres(self):
+        conn = psycopg2.connect(f"host='host.docker.internal' port='5432' dbname='spotify' user='{pg_user}' password='{pg_password}'")
+        cur = conn.cursor()
+
+        datasets = [
+            'spotify_songs'
+            # 'spotify_genres'
+        ]
+
+        for dataset in datasets:
+            f = open(f'/opt/airflow/dags/spotify_data/{dataset}.csv', 'r')
+            # print(f.read())
+            cur.copy_from(f, dataset, sep=',')
+            conn.commit()
+            f.close()
+            print(f'Loaded {dataset}')
 
     def call_refresh(self):
         print("Refreshing token...")
@@ -130,6 +165,8 @@ class RetrieveSongs:
         self.spotify_token = refreshCaller.refresh()
         print("Getting songs...")
         self.get_songs()
+        print("Loading to postgres...")
+        self.load_to_postgres()
 
 if __name__ == "__main__":
     tracks = RetrieveSongs()
