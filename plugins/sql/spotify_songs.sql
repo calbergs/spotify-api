@@ -10,7 +10,7 @@ SELECT
 	song_name,
 	artist_name,
 	song_duration_ms,
-	cast(song_duration_ms as decimal)/60000 as song_duration_minutes,
+	cast(song_duration_ms as decimal)/60000 as song_duration_mins,
 	song_link,
 	album_art_link,
 	album_name,
