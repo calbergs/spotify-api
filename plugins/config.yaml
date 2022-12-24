@@ -1,0 +1,2 @@
+spotify_songs_path: '/opt/airflow/dags/spotify_data/spotify_songs/'
+spotify_genres_path: '/opt/airflow/dags/spotify_data/spotify_genres/'
