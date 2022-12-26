@@ -69,6 +69,7 @@ class RetrieveSongs:
         # album_release_dates = []
         album_ids = []
         artist_ids = []
+        track_ids = []
 
         # Extract only the necessary data from the json object
         for song in song_data["items"]:
@@ -83,6 +84,7 @@ class RetrieveSongs:
             # album_release_dates.append(song["track"]["album"]["release_date"])
             album_ids.append(song["track"]["album"]["id"])
             artist_ids.append(song["track"]["artists"][0]["id"])
+            track_ids.append(song["track"]["id"])
 
         # Prepare a dictionary in order to turn it into a pandas dataframe
         song_dict = {
@@ -95,7 +97,8 @@ class RetrieveSongs:
             "album_art_link": album_art_links,
             "album_name": album_names,
             "album_id": album_ids,
-            "artist_id": artist_ids
+            "artist_id": artist_ids,
+            "track_id": track_ids
         }
 
         song_df = pd.DataFrame(song_dict, columns = [
@@ -108,7 +111,8 @@ class RetrieveSongs:
             "album_art_link",
             "album_name",
             "album_id",
-            "artist_id"
+            "artist_id",
+            "track_id"
         ])
 
         last_updated_datetime_utc = dt.datetime.utcnow()
