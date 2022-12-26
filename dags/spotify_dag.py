@@ -72,7 +72,7 @@ args = {
 
 dag = DAG(
     dag_id='spotify_dag',
-    schedule_interval='*/30 * * * *', #'*/30 8-23,0,1 * * *'
+    schedule_interval='*/30 8-23,0,1 * * *',
     max_active_runs=1,
     catchup=False,
     default_args=args
@@ -84,50 +84,17 @@ extract_data = BashOperator(
     dag=dag
 )
 
-drop_spotify_genres_table = PostgresOperator(
-    task_id="drop_spotify_genres_table",
-    postgres_conn_id="postgres_localhost",
-    sql="""
-    drop table spotify_genres
-    """,
-    dag=dag
-)
-
 create_if_not_exists_spotify_genres_table = PostgresOperator(
     task_id="create_if_not_exists_spotify_genres_table",
     postgres_conn_id="postgres_localhost",
-    sql="""
-    create table spotify_genres (
-        artist_id text,
-        artist_name text,
-        artist_genre text,
-        last_updated_datetime_utc timestamp,
-        primary key (artist_id)
-    )
-    """,
+    sql="sql/create_spotify_genres.sql",
     dag=dag
 )
 
 create_if_not_exists_spotify_songs_table = PostgresOperator(
     task_id="create_if_not_exists_spotify_songs_table",
     postgres_conn_id="postgres_localhost",
-    sql="""
-    create table if not exists spotify_songs (
-        played_at_utc timestamp,
-        played_date_utc date,
-        song_name text,
-        artist_name text,
-        song_duration_ms integer,
-        song_link text,
-        album_art_link text,
-        album_name text,
-        album_id text,
-        artist_id text,
-        track_id text,
-        last_updated_datetime_utc timestamp,
-        primary key (played_at_utc)
-    )
-    """,
+    sql="sql/create_spotify_songs.sql",
     dag=dag
 )
 
@@ -173,8 +140,15 @@ load_songs = PythonOperator(
     dag=dag
 )
 
-start_task = DummyOperator(task_id="start", dag=dag)
-end_task = DummyOperator(task_id="end", on_success_callback=task_success_slack_alert, dag=dag)
+start_task = DummyOperator(
+    task_id="start",
+    dag=dag
+)
 
-start_task >> drop_spotify_genres_table >> create_if_not_exists_spotify_genres_table >> extract_data >> [load_songs,load_genres] >> end_task
-start_task >> create_if_not_exists_spotify_songs_table >> extract_data
+end_task = DummyOperator(
+    task_id="end",
+    on_success_callback=task_success_slack_alert,
+    dag=dag
+)
+
+start_task >> [create_if_not_exists_spotify_genres_table, create_if_not_exists_spotify_songs_table] >> extract_data >> [load_songs, load_genres] >> end_task
