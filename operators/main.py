@@ -34,11 +34,12 @@ class RetrieveSongs:
 
         max_played_at_utc = cur.fetchall()[0][0]
 
+        # If the spotify_songs table is empty, grab the earliest data we can. Set at t - 90 days for now.
         if max_played_at_utc == None:
             today = dt.datetime.now()
-            yesterday = today - dt.timedelta(days=1)
-            yesterday_unix_timestamp = int(yesterday.timestamp()) * 1000
-            latest_timestamp = yesterday_unix_timestamp
+            previous_date = today - dt.timedelta(days=90)
+            previous_date_unix_timestamp = int(previous_date.timestamp()) * 1000
+            latest_timestamp = previous_date_unix_timestamp
         else:
             latest_timestamp = int(max_played_at_utc.timestamp()) * 1000
         return latest_timestamp
@@ -53,7 +54,7 @@ class RetrieveSongs:
 
         latest_timestamp = RetrieveSongs().get_latest_listened_timestamp()
 
-        # Download all songs listened to since the last run
+        # Download all songs listened to since the last run or since the earliest listen date defined in the get_latest_listened_timestamp function
         song_response = requests.get("https://api.spotify.com/v1/me/player/recently-played?limit=50&after={time}".format(time=latest_timestamp), headers = headers)
 
         song_data = song_response.json()
