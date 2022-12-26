@@ -67,7 +67,6 @@ class RetrieveSongs:
         song_links = []
         album_art_links = []
         album_names = []
-        # album_release_dates = []
         album_ids = []
         artist_ids = []
         track_ids = []
@@ -82,7 +81,6 @@ class RetrieveSongs:
             song_links.append(song["track"]["external_urls"]["spotify"])
             album_art_links.append(song["track"]["album"]["images"][1]["url"])
             album_names.append(song["track"]["album"]["name"])
-            # album_release_dates.append(song["track"]["album"]["release_date"])
             album_ids.append(song["track"]["album"]["id"])
             artist_ids.append(song["track"]["artists"][0]["id"])
             track_ids.append(song["track"]["id"])
@@ -117,7 +115,6 @@ class RetrieveSongs:
         ])
 
         last_updated_datetime_utc = dt.datetime.utcnow()
-        # last_updated_date_utc = dt.datetime.strftime(last_updated_datetime_utc, '%Y-%m-%d')
         song_df['last_updated_datetime_utc'] = last_updated_datetime_utc
         song_df = song_df.sort_values('played_at_utc', ascending=True)
 
@@ -188,37 +185,12 @@ class RetrieveSongs:
             artist_genre_df_nh.to_csv('/opt/airflow/dags/spotify_data/spotify_genres.csv', index=False)
         os.remove('/opt/airflow/dags/spotify_data/spotify_genres_tmp.csv')
 
-    def load_to_postgres(self):
-        conn = psycopg2.connect(f"host='{host}' port='{port}' dbname='{dbname}' user='{pg_user}' password='{pg_password}'")
-        cur = conn.cursor()
-
-        datasets = [
-            'spotify_songs',
-            'spotify_genres'
-        ]
-
-        # for dataset in datasets:
-        #     f = open(f'/opt/airflow/dags/spotify_data/{dataset}.csv', 'r')
-        #     cur.copy_from(f, dataset, sep=',')
-        #     conn.commit()
-        #     f.close()
-        #     print(f'Loaded {dataset}')
-
-        query ="""
-        copy spotify_genres
-        from '/opt/airflow/dags/spotify_data/spotify_genres.csv'
-        delimiter ',' csv;
-        """
-        cur.execute(query)
-
     def call_refresh(self):
         print("Refreshing token...")
         refreshCaller= Refresh()
         self.spotify_token = refreshCaller.refresh()
         print("Getting songs...")
         self.get_songs()
-        # print("Loading to postgres...")
-        # self.load_to_postgres()
 
 if __name__ == "__main__":
     tracks = RetrieveSongs()

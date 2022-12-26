@@ -78,8 +78,8 @@ dag = DAG(
     default_args=args
 )
 
-extract_data = BashOperator(
-    task_id='make_api_requests_and_download_responses',
+extract_spotify_data = BashOperator(
+    task_id='extract_spotify_data',
     bash_command='python3 /opt/airflow/operators/main.py',
     dag=dag
 )
@@ -151,4 +151,4 @@ end_task = DummyOperator(
     dag=dag
 )
 
-start_task >> [create_if_not_exists_spotify_genres_table, create_if_not_exists_spotify_songs_table] >> extract_data >> [load_songs, load_genres] >> end_task
+start_task >> [create_if_not_exists_spotify_genres_table, create_if_not_exists_spotify_songs_table] >> extract_spotify_data >> [load_songs, load_genres] >> end_task
