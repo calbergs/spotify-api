@@ -1,12 +1,12 @@
 from airflow import DAG
+from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
+from airflow.hooks.base_hook import BaseHook
+from airflow.hooks.postgres_hook import PostgresHook
 from airflow.operators.bash import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.operators.python import PythonOperator
 from datetime import timedelta, datetime
-from airflow.hooks.postgres_hook import PostgresHook
-from airflow.hooks.base_hook import BaseHook
-from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
 
 SLACK_CONN_ID = 'slack'
 
