@@ -1,0 +1,1 @@
+drop table spotify_genres;
