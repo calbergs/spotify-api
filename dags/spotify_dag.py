@@ -151,4 +151,4 @@ end_task = DummyOperator(
     dag=dag
 )
 
-start_task >> [create_if_not_exists_spotify_genres_table, create_if_not_exists_spotify_songs_table] >> extract_spotify_data >> [load_songs, load_genres] >> end_task
+start_task >> [create_if_not_exists_spotify_genres_table, create_if_not_exists_spotify_songs_table] >> extract_spotify_data >> [load_genres, load_songs] >> end_task
