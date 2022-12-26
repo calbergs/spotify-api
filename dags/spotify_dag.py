@@ -5,28 +5,74 @@ from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.operators.python import PythonOperator
 from datetime import timedelta, datetime
 from airflow.hooks.postgres_hook import PostgresHook
+from airflow.hooks.base_hook import BaseHook
+from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
 
-def failure_email_function(context):
-    dag_run = context.get('dag_run')
-    msg = "Your Dag has failed"
-    subject = f"DAG {dag_run} has failed"
-    send_email(to='albert.rich.cheng@gmail.com', subject=subject, html_content=msg)
+SLACK_CONN_ID = 'slack'
+
+def task_fail_slack_alert(context):
+    slack_webhook_token = BaseHook.get_connection(SLACK_CONN_ID).password
+    slack_msg = """
+        :x: Task Failed
+*Task*: {task}
+*Dag*: {dag}
+*Execution Time*: {exec_date}
+*Log URL*: {log_url}
+        """.format(
+        task=context.get('task_instance').task_id,
+        dag=context.get('task_instance').dag_id,
+        ti=context.get('task_instance'),
+        exec_date=context.get('execution_date'),
+        log_url=context.get('task_instance').log_url,
+    )
+    failed_alert = SlackWebhookOperator(
+        task_id='slack_test',
+        http_conn_id='slack',
+        webhook_token=slack_webhook_token,
+        message=slack_msg,
+        username='airflow',
+        dag=dag
+    )
+    return failed_alert.execute(context=context)
+
+def task_success_slack_alert(context):
+    slack_webhook_token = BaseHook.get_connection(SLACK_CONN_ID).password
+    slack_msg = """
+        :white_check_mark: Task Succeeded
+*Task*: {task}
+*Dag*: {dag}
+*Execution Time*: {exec_date}
+*Log URL*: {log_url}
+        """.format(
+        task=context.get('task_instance').task_id,
+        dag=context.get('task_instance').dag_id,
+        ti=context.get('task_instance'),
+        exec_date=context.get('execution_date'),
+        log_url=context.get('task_instance').log_url,
+    )
+    failed_alert = SlackWebhookOperator(
+        task_id='slack_test',
+        http_conn_id='slack',
+        webhook_token=slack_webhook_token,
+        message=slack_msg,
+        username='airflow',
+        dag=dag
+    )
+    return failed_alert.execute(context=context)
 
 args = {
     'owner': 'airflow',
-    'email': ['albert.rich.cheng@gmail.com'],
-    'email_on_failure': True,
-    'email_on_retry': False,
-    'on_failure_callback': failure_email_function,
     'depends_on_past': False,
     'start_date': datetime(2022, 12, 21),
     'retries': 1,
-    'retry_delay': timedelta(minutes=1)
+    'retry_delay': timedelta(minutes=1),
+    'on_success_callback': None,
+    'on_failure_callback': task_fail_slack_alert
 }
 
 dag = DAG(
     dag_id='spotify_dag',
-    schedule_interval='*/20 * * * *',
+    schedule_interval='*/30 * * * *', #'*/30 8-23,0,1 * * *'
     max_active_runs=1,
     catchup=False,
     default_args=args
@@ -34,8 +80,7 @@ dag = DAG(
 
 extract_data = BashOperator(
     task_id='make_api_requests_and_download_responses',
-    bash_command='python3 /opt/airflow/plugins/main.py',
-    email_on_failure=failure_email_function,
+    bash_command='python3 /opt/airflow/operators/main.py',
     dag=dag
 )
 
@@ -45,7 +90,6 @@ drop_spotify_genres_table = PostgresOperator(
     sql="""
     drop table spotify_genres
     """,
-    email_on_failure=failure_email_function,
     dag=dag
 )
 
@@ -61,7 +105,6 @@ create_if_not_exists_spotify_genres_table = PostgresOperator(
         primary key (artist_id)
     )
     """,
-    email_on_failure=failure_email_function,
     dag=dag
 )
 
@@ -80,11 +123,11 @@ create_if_not_exists_spotify_songs_table = PostgresOperator(
         album_name text,
         album_id text,
         artist_id text,
+        track_id text,
         last_updated_datetime_utc timestamp,
         primary key (played_at_utc)
     )
     """,
-    email_on_failure=failure_email_function,
     dag=dag
 )
 
@@ -121,19 +164,17 @@ def copy_expert_songs_csv():
 load_genres = PythonOperator(
     task_id="load_genres",
     python_callable=copy_expert_genres_csv,
-    email_on_failure=failure_email_function,
     dag=dag
 )
 
 load_songs = PythonOperator(
     task_id="load_songs",
     python_callable=copy_expert_songs_csv,
-    email_on_failure=failure_email_function,
     dag=dag
 )
 
 start_task = DummyOperator(task_id="start", dag=dag)
-end_task = DummyOperator(task_id="end", dag=dag)
+end_task = DummyOperator(task_id="end", on_success_callback=task_success_slack_alert, dag=dag)
 
 start_task >> drop_spotify_genres_table >> create_if_not_exists_spotify_genres_table >> extract_data >> [load_songs,load_genres] >> end_task
 start_task >> create_if_not_exists_spotify_songs_table >> extract_data
