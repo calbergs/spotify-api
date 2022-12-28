@@ -6,8 +6,16 @@ secrets.py
 **/*.env
 dev_script.py
 test*
+.user.yml
 
 # Airflow
 **/logs/*
 **/dags/spotify_data/
 test_dag.py
+
+# dbt
+**target/
+**dbt_packages/
+**logs/
+**.log
+**profiles.yml
