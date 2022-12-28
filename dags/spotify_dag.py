@@ -6,12 +6,18 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.operators.python import PythonOperator
+from airflow_dbt.operators.dbt_operator import (
+    DbtSeedOperator,
+    DbtSnapshotOperator,
+    DbtRunOperator,
+    DbtTestOperator
+)
 from datetime import timedelta, datetime
 
-SLACK_CONN_ID = 'slack'
+slack_conn_id = 'slack'
 
 def task_fail_slack_alert(context):
-    slack_webhook_token = BaseHook.get_connection(SLACK_CONN_ID).password
+    slack_webhook_token = BaseHook.get_connection(slack_conn_id).password
     slack_msg = """
         :x: Task Failed
 *Task*: {task}
@@ -36,7 +42,7 @@ def task_fail_slack_alert(context):
     return failed_alert.execute(context=context)
 
 def task_success_slack_alert(context):
-    slack_webhook_token = BaseHook.get_connection(SLACK_CONN_ID).password
+    slack_webhook_token = BaseHook.get_connection(slack_conn_id).password
     slack_msg = """
         :white_check_mark: Task Succeeded
 *Task*: {task}
@@ -72,7 +78,7 @@ args = {
 
 dag = DAG(
     dag_id='spotify_dag',
-    schedule_interval='*/30 8-23,0,1 * * *',
+    schedule_interval='*/30 0-6,14-23 * * *',
     max_active_runs=1,
     catchup=False,
     default_args=args
@@ -140,6 +146,20 @@ load_songs = PythonOperator(
     dag=dag
 )
 
+dbt_run = DbtRunOperator(
+    task_id="dbt_run",
+    dir="/opt/airflow/operators/dbt/",
+    profiles_dir="/opt/airflow/operators/dbt",
+    dag=dag
+)
+
+dbt_test = DbtTestOperator(
+    task_id="dbt_test",
+    dir="/opt/airflow/operators/dbt/",
+    profiles_dir="/opt/airflow/operators/dbt",
+    dag=dag
+)
+
 start_task = DummyOperator(
     task_id="start",
     dag=dag
@@ -147,8 +167,7 @@ start_task = DummyOperator(
 
 end_task = DummyOperator(
     task_id="end",
-    on_success_callback=task_success_slack_alert,
     dag=dag
 )
 
-start_task >> [create_if_not_exists_spotify_genres_table, create_if_not_exists_spotify_songs_table] >> extract_spotify_data >> [load_genres, load_songs] >> end_task
+start_task >> [create_if_not_exists_spotify_genres_table, create_if_not_exists_spotify_songs_table] >> extract_spotify_data >> [load_genres, load_songs] >> dbt_run >> dbt_test >> end_task
