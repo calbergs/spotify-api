@@ -1,3 +1,4 @@
+airflow-dbt
 pandas
 psycopg2
 requests
