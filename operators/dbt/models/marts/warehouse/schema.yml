@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: dim_songs
+    description: "Songs table"
+    columns:
+      - name: played_at_cst
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_genres
+    description: "Genres table"
+    columns:
+      - name: artist_id
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_listening_activity
+    description: "User's listening activity"
+    columns:
+      - name: played_at_cst
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null

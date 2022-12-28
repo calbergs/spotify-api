@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: spotify
+    description: 'Spotify raw data landing zone'
+    database: spotify
+    schema: public
+    tables:
+      - name: spotify_songs
+        description: 'Details about the songs the user listened to'
+      - name: spotify_genres
+        description: 'Details about the corresponding genres of the songs the user listened to'

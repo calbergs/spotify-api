@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: rpt_most_listened
+    description: "Most listened artists and tracks"
+    columns:
+      - name: track_id
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
