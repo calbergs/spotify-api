@@ -12,6 +12,7 @@ airflow_docker.md
 postgres.md
 slack_notifications.md
 metabase.md
+spotify.drawio
 
 # Airflow
 **/logs/*
