@@ -28,3 +28,6 @@
     <p>- your_client_id:your_client_secret<br>
     - Using the format above convert to a base 64 encoded string by going to [base64encode.org](https://www.base64encode.org/), pasting in the string, and then clicking encode. Ensure encode is selected and not decode.<br>
     - This will be defined as base_64 in our code and will be used when we generate a new access token on each run<br>
+
+References:
+https://developer.spotify.com/console/get-recently-played/?limit=&after=&before=
