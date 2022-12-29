@@ -7,6 +7,10 @@ secrets.py
 dev_script.py
 test*
 .user.yml
+dbt.md
+docker.md
+postgres.md
+slack_notifications.md
 
 # Airflow
 **/logs/*
