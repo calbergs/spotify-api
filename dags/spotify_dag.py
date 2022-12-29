@@ -149,14 +149,14 @@ load_songs = PythonOperator(
 dbt_run = DbtRunOperator(
     task_id="dbt_run",
     dir="/opt/airflow/operators/dbt/",
-    profiles_dir="/opt/airflow/operators/dbt",
+    profiles_dir="/opt/airflow/operators/dbt/",
     dag=dag
 )
 
 dbt_test = DbtTestOperator(
     task_id="dbt_test",
     dir="/opt/airflow/operators/dbt/",
-    profiles_dir="/opt/airflow/operators/dbt",
+    profiles_dir="/opt/airflow/operators/dbt/",
     dag=dag
 )
 
@@ -171,3 +171,4 @@ end_task = DummyOperator(
 )
 
 start_task >> [create_if_not_exists_spotify_genres_table, create_if_not_exists_spotify_songs_table] >> extract_spotify_data >> [load_genres, load_songs] >> dbt_run >> dbt_test >> end_task
+# start_task >> [create_if_not_exists_spotify_genres_table, create_if_not_exists_spotify_songs_table] >> extract_spotify_data >> [load_genres, load_songs] >> end_task
