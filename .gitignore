@@ -11,6 +11,7 @@ dbt.md
 docker.md
 postgres.md
 slack_notifications.md
+metabase.md
 
 # Airflow
 **/logs/*
