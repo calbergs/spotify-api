@@ -171,4 +171,3 @@ end_task = DummyOperator(
 )
 
 start_task >> [create_if_not_exists_spotify_genres_table, create_if_not_exists_spotify_songs_table] >> extract_spotify_data >> [load_genres, load_songs] >> dbt_run >> dbt_test >> end_task
-# start_task >> [create_if_not_exists_spotify_genres_table, create_if_not_exists_spotify_songs_table] >> extract_spotify_data >> [load_genres, load_songs] >> end_task
