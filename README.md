@@ -1,3 +1,3 @@
 ### Spotify Data Pipeline
 
-![spotify](https://user-images.githubusercontent.com/60953643/210040422-f4cfba2a-0cb4-4188-864e-15c19de390a2.png)
+![spotify](https://user-images.githubusercontent.com/60953643/210040694-f523aeb4-ba4e-429f-ac75-d4d6f5950d24.png)
