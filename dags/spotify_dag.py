@@ -6,10 +6,7 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.operators.python import PythonOperator
-from airflow_dbt.operators.dbt_operator import (
-    DbtRunOperator,
-    DbtTestOperator
-)
+from airflow_dbt.operators.dbt_operator import DbtRunOperator, DbtTestOperator
 from datetime import timedelta, datetime
 
 def task_fail_slack_alert(context):
