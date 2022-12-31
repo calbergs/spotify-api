@@ -14,10 +14,8 @@ from airflow_dbt.operators.dbt_operator import (
 )
 from datetime import timedelta, datetime
 
-slack_conn_id = 'slack'
-
 def task_fail_slack_alert(context):
-    slack_webhook_token = BaseHook.get_connection(slack_conn_id).password
+    slack_webhook_token = BaseHook.get_connection('slack').password
     slack_msg = """
         :x: Task Failed
         *Task*: {task}
@@ -42,33 +40,23 @@ def task_fail_slack_alert(context):
     return failed_alert.execute(context=context)
 
 def copy_expert_genres_csv():
-    hook = PostgresHook(
-        postgres_conn_id='postgres_localhost',
-        host='host.docker.internal',
-        database='spotify',
-        user='airflow',
-        password='airflow',
-        port=5432
-    )
+    hook = PostgresHook('postgres_localhost')
     with hook.get_conn() as connection:
-            hook.copy_expert("""COPY spotify_genres FROM stdin WITH CSV HEADER
-                        DELIMITER as ',' """,
-                        '/opt/airflow/dags/spotify_data/spotify_genres.csv')
+            hook.copy_expert("""
+            COPY spotify_genres FROM stdin WITH CSV HEADER DELIMITER as ','
+            """,
+            '/opt/airflow/dags/spotify_data/spotify_genres.csv'
+            )
             connection.commit()
 
 def copy_expert_songs_csv():
-    hook = PostgresHook(
-        postgres_conn_id='postgres_localhost',
-        host='host.docker.internal',
-        database='spotify',
-        user='airflow',
-        password='airflow',
-        port=5432
-    )
+    hook = PostgresHook('postgres_localhost')
     with hook.get_conn() as connection:
-            hook.copy_expert("""COPY spotify_songs FROM stdin WITH CSV HEADER
-                        DELIMITER as ',' """,
-                        '/opt/airflow/dags/spotify_data/spotify_songs.csv')
+            hook.copy_expert("""
+            COPY spotify_songs FROM stdin WITH CSV HEADER DELIMITER as ','
+            """,
+            '/opt/airflow/dags/spotify_data/spotify_songs.csv'
+            )
             connection.commit()
 
 args = {
