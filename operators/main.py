@@ -11,20 +11,19 @@ import requests
 from datetime import datetime
 from io import StringIO
 from pathlib import Path
-from refresh import Refresh
-from secrets import spotify_user_id, pg_user, pg_password, host, port, dbname
+from postgres_connect import ConnectPostgres
+from refresh import RefreshToken
+from secrets import spotify_user_id
+from yaml_load import yaml_loader
 
 class RetrieveSongs:
     def __init__(self):
         self.user_id = spotify_user_id # Spotify username
-        self.pg_user = pg_user
-        self.pg_password = pg_password
         self.spotify_token = "" # Spotify access token
-        self.artists_id_dedup = "" # Deduped list of artist ids
 
     # Query the postgres database to get the latest played timestamp
     def get_latest_listened_timestamp(self):
-        conn = psycopg2.connect(f"host='{host}' port='{port}' dbname='{dbname}' user='{pg_user}' password='{pg_password}'")
+        conn = ConnectPostgres().postgres_connector()
         cur = conn.cursor()
 
         query = "SELECT MAX(played_at_utc) FROM public.spotify_songs"
@@ -53,6 +52,10 @@ class RetrieveSongs:
         }
 
         latest_timestamp = RetrieveSongs().get_latest_listened_timestamp()
+        config = yaml_loader()
+        songs = config['files']['songs']
+        genres = config['files']['genres']
+        genres_tmp = config['files']['genres_tmp']
 
         # Download all songs listened to since the last run or since the earliest listen date defined in the get_latest_listened_timestamp function
         song_response = requests.get("https://api.spotify.com/v1/me/player/recently-played?limit=50&after={time}".format(time=latest_timestamp), headers = headers)
@@ -118,15 +121,15 @@ class RetrieveSongs:
         song_df['last_updated_datetime_utc'] = last_updated_datetime_utc
         song_df = song_df.sort_values('played_at_utc', ascending=True)
 
-        # Remove latest song since last run since this will be a duplicate
+        # Remove latest song since last run since this will be a duplicate then write to csv
         song_df = song_df.iloc[1: , :]
-        song_df.to_csv('/opt/airflow/dags/spotify_data/spotify_songs.csv', index=False)
+        song_df.to_csv(f'{songs}.csv', index=False)
 
         for date in set(song_df['played_date_utc']):
             played_dt = datetime.strptime(date, '%Y-%m-%d')
             date_year = played_dt.year
             date_month = played_dt.month
-            output_song_dir = Path(f'/opt/airflow/dags/spotify_data/spotify_songs/{date_year}/{date_month}')
+            output_song_dir = Path(f'{songs}/{date_year}/{date_month}')
             output_song_file = f'{date}.csv'
             path_to_songs_file = f'{output_song_dir}/{output_song_file}'
             songs_file_exists = os.path.exists(path_to_songs_file)
@@ -172,23 +175,23 @@ class RetrieveSongs:
             "artist_genre"
         ])
 
-        artist_genre_df.to_csv('/opt/airflow/dags/spotify_data/spotify_genres_tmp.csv', index=False)
-        artist_genre_df_nh = pd.read_csv('/opt/airflow/dags/spotify_data/spotify_genres_tmp.csv', sep=',')
+        artist_genre_df.to_csv(f'{genres_tmp}.csv', index=False)
+        artist_genre_df_nh = pd.read_csv(f'{genres_tmp}.csv', sep=',')
         try:
-            curr_artist_genre_df = pd.read_csv('/opt/airflow/dags/spotify_data/spotify_genres.csv', sep=',')
+            curr_artist_genre_df = pd.read_csv(f'{genres}.csv', sep=',')
             curr_artist_genre_df = curr_artist_genre_df.append(artist_genre_df_nh)
             curr_artist_genre_df.drop_duplicates(subset="artist_id", keep="first", inplace=True)
             curr_artist_genre_df['last_updated_datetime_utc'] = last_updated_datetime_utc
-            curr_artist_genre_df.to_csv('/opt/airflow/dags/spotify_data/spotify_genres.csv', index=False)
+            curr_artist_genre_df.to_csv(f'{genres}.csv', index=False)
         except:
             artist_genre_df_nh['last_updated_datetime_utc'] = last_updated_datetime_utc
-            artist_genre_df_nh.to_csv('/opt/airflow/dags/spotify_data/spotify_genres.csv', index=False)
-        os.remove('/opt/airflow/dags/spotify_data/spotify_genres_tmp.csv')
+            artist_genre_df_nh.to_csv(f'{genres}.csv', index=False)
+        os.remove(f'{genres_tmp}.csv')
 
     def call_refresh(self):
         print("Refreshing token...")
-        refreshCaller= Refresh()
-        self.spotify_token = refreshCaller.refresh()
+        refresher = RefreshToken()
+        self.spotify_token = refresher.refresh()
         print("Getting songs...")
         self.get_songs()
 
