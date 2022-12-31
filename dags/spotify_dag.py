@@ -37,22 +37,22 @@ def task_fail_slack_alert(context):
 def copy_expert_genres_csv():
     hook = PostgresHook('postgres_localhost')
     with hook.get_conn() as connection:
-            hook.copy_expert("""
-            COPY spotify_genres FROM stdin WITH CSV HEADER DELIMITER as ','
-            """,
-            '/opt/airflow/dags/spotify_data/spotify_genres.csv'
-            )
-            connection.commit()
+        hook.copy_expert("""
+        COPY spotify_genres FROM stdin WITH CSV HEADER DELIMITER as ','
+        """,
+        '/opt/airflow/dags/spotify_data/spotify_genres.csv'
+        )
+        connection.commit()
 
 def copy_expert_songs_csv():
     hook = PostgresHook('postgres_localhost')
     with hook.get_conn() as connection:
-            hook.copy_expert("""
-            COPY spotify_songs FROM stdin WITH CSV HEADER DELIMITER as ','
-            """,
-            '/opt/airflow/dags/spotify_data/spotify_songs.csv'
-            )
-            connection.commit()
+        hook.copy_expert("""
+        COPY spotify_songs FROM stdin WITH CSV HEADER DELIMITER as ','
+        """,
+        '/opt/airflow/dags/spotify_data/spotify_songs.csv'
+        )
+        connection.commit()
 
 args = {
     'owner': 'airflow',
