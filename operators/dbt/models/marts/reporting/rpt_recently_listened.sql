@@ -12,15 +12,15 @@ with listening_activity as (
 
 final as (
 
-    select distinct
+    select
+        played_at,
         song_name,
         artist_name,
         album_name,
         artist_genre,
+        song_duration_mins,
         song_link,
-        count(track_id) over (partition by artist_name, song_name) as times_song_listened,
-        count(artist_id) over (partition by artist_id) as times_artist_listened,
-        max(played_date) over (partition by track_id) as song_last_listened_date
+        last_updated_datetime
 
     from listening_activity
 )
