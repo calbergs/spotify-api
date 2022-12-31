@@ -6,7 +6,7 @@ import json
 import requests
 from secrets import refresh_token, base_64
 
-class Refresh:
+class RefreshToken:
     def __init__(self):
         self.refresh_token = refresh_token
         self.base_64 = base_64
@@ -28,5 +28,5 @@ class Refresh:
         return response_json["access_token"]
 
 if __name__ == "__main__":
-    new_token = Refresh()
+    new_token = RefreshToken()
     new_token.refresh()
