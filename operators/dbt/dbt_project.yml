@@ -38,8 +38,8 @@ models:
       +materialized: table
       reporting:
         +schema: reporting
-      warehouse:
-        +schema: warehouse
+      analytical:
+        +schema: analytical
     staging:
       +materialized: table
       spotify:

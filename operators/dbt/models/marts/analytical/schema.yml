@@ -22,7 +22,7 @@ models:
   - name: fct_listening_activity
     description: "User's listening activity"
     columns:
-      - name: played_at_cst
+      - name: played_at
         description: "The primary key for this table"
         tests:
           - unique

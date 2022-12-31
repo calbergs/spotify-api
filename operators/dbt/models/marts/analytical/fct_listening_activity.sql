@@ -19,14 +19,14 @@ genres as (
 final as (
 
 	select
-		songs.played_at_cst,
-		songs.played_date_cst,
-		to_char(songs.played_at_cst, 'Day') as played_at_cst_day_of_week,
-		extract(year from songs.played_at_cst) as played_at_cst_year,
-		extract(month from songs.played_at_cst) as played_at_cst_month,
-		extract(day from songs.played_at_cst) as played_at_cst_day,
-		DATE_PART('week', songs.played_at_cst) as played_at_cst_week_number,
-		extract(hour from songs.played_at_cst) as played_at_cst_hour,
+		songs.played_at_cst as played_at,
+		songs.played_date_cst as played_date,
+		to_char(songs.played_at_cst, 'Day') as played_at_day_of_week,
+		extract(year from songs.played_at_cst) as played_at_year,
+		extract(month from songs.played_at_cst) as played_at_month,
+		extract(day from songs.played_at_cst) as played_at_day,
+		DATE_PART('week', songs.played_at_cst) as played_at_week_number,
+		extract(hour from songs.played_at_cst) as played_at_hour,
 		songs.song_name,
 		songs.artist_name,
 		genres.artist_genre,
@@ -38,7 +38,7 @@ final as (
 		songs.album_id,
 		songs.artist_id,
 		songs.track_id,
-		songs.last_updated_datetime_cst
+		songs.last_updated_datetime_cst as last_updated_datetime
 
 	from songs
 
