@@ -1,0 +1,4 @@
+files:
+  songs: '/opt/airflow/dags/spotify_data/spotify_songs'
+  genres: '/opt/airflow/dags/spotify_data/spotify_genres'
+  genres_tmp: '/opt/airflow/dags/spotify_data/spotify_genres_tmp'
