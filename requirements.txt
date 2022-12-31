@@ -1,4 +1,5 @@
 airflow-dbt
 pandas
 psycopg2
+pyyaml
 requests
