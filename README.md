@@ -136,7 +136,7 @@ Deep dive into a user's song listening history to retrieve information about top
 ### Set up Slack notifications via Airflow
 
 - Create a channel in your workspace where the alerts will be sent
-- Go to [**api.slack.com/apps**](api.slack.com/apps) and click on "Create New App" then click on "From scratch"
+- Go to api.slack.com/apps and click on "Create New App" then click on "From scratch"
 - Give your app a name and select your workspace where the alerts will be sent then click "Create App"
 - Enable incoming webhooks for your Slack workspace app
 - You can test your webhook from the command line by running the code below (replace with your own key):
