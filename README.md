@@ -181,3 +181,4 @@ Deep dive into a user's song listening history to retrieve information about top
 - Create unit tests to ensure pipeline is running as intended
 - Include CI/CD
 - Create more visualizations to uncover more insights
+- Whenever Spotify allows requesting historical data implement backfill capability (current API only allows requesting the 50 most recently played tracks)
