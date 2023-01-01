@@ -128,7 +128,7 @@ Deep dive into a user's song listening history to retrieve information about top
   ```
   dbt debug
   ```
-- Test that dbt is building the models correctly. If successful you can verify the new tables/views in the database
+- Test that dbt is building the models correctly. If successful you can verify the new tables/views in the database.
   ```
   dbt run
   ```
