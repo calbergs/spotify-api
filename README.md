@@ -160,7 +160,7 @@ Deep dive into a user's song listening history to retrieve information about top
  
 ### Set up Metabase
 
-- Download Metabase [**JAR file**](https://www.metabase.com/start/oss/) (or your method of choice)
+- Download the Metabase [**JAR file**](https://www.metabase.com/start/oss/) (or your method of choice)
 - Create a new directory and move the Metabase JAR file into it
 - Ensure the [**latest Java version**](https://www.oracle.com/java/technologies/downloads/#jdk19-mac) is downloaded
 - Change into your new Metabase directory and run the JAR
