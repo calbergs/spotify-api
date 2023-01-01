@@ -1,6 +1,6 @@
 # Spotify Data Pipeline
 
-Data pipeline that extracts a user's song listening history using Python, PostgreSQL, dbt, Metabase, Airflow, and Docker
+Data pipeline that extracts a user's song listening history from the Spotify API using Python, PostgreSQL, dbt, Metabase, Airflow, and Docker
 
 ## Objective
 
