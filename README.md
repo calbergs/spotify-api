@@ -10,7 +10,7 @@ Deep dive into a user's song listening history to retrieve information about top
 
 - Containerization - [**Docker**](https://www.docker.com), [**Docker Compose**](https://docs.docker.com/compose/)
 - Orchestration - [**Airflow**](https://airflow.apache.org)
-- Data Warehouse - [**PostgreSQL**](https://www.postgresql.org/)
+- Database - [**PostgreSQL**](https://www.postgresql.org/)
 - Transformation - [**dbt**](https://www.getdbt.com)
 - Data Visualization - [**Metabase**](https://www.metabase.com/)
 - Language - [**Python**](https://www.python.org)
