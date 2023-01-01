@@ -17,7 +17,7 @@ Deep dive into a user's song listening history to retrieve information about top
 
 ## Architecture
 
-![spotify_architecture](https://user-images.githubusercontent.com/60953643/210158660-a3e0b63b-0e5b-49ff-bdac-298ebcdd0a56.png)
+![spotify_architecture drawio](https://user-images.githubusercontent.com/60953643/210160261-98c3ff9e-3c54-4407-b758-828322fbc2ad.png)
 
 ## Dashboard
 <img width="1726" alt="Screenshot 2022-12-31 at 7 41 09 PM" src="https://user-images.githubusercontent.com/60953643/210158921-0024a44f-2273-40dd-b974-cede87ef5d69.png">
