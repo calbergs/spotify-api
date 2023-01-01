@@ -14,4 +14,5 @@ class ConnectPostgres:
         return conn
 
 if __name__ == "__main__":
-    conn = postgres_connector()
+    conn = ConnectPostgres()
+    conn.postgres_connector()
