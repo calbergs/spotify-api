@@ -14,7 +14,7 @@
   ```
   dbt init <your-folder-path>
   ```
-- Update the profiles.yml file found in Users/<your-username>/.dbt/
+- Update the profiles.yml file found in Users/<your_username>/.dbt/
   - Update all the appropriate configurations based on the [**dbt setup guide**](https://docs.getdbt.com/reference/warehouse-setups/postgres-setup)
 - Go to the dbt_project.yml file and make sure the profile configuration matches with the one in the profiles.yml file
 - Ensure the database setup was done correctly
