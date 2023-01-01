@@ -4,7 +4,7 @@ Data pipeline that extracts a user's song listening history from the Spotify API
 
 ## Objective
 
-Deep dive into a user's song listening history to retrieve information about top artists, top tracks, top genres, and more. This is a personal side project for fun to recreate Spotify Wrapped but at a more frequent cadence to get quicker and more detailed insights. This pipeline will call the Spotify API every 30 minutes from hours 0-6 and 14-23 UTC (basically whenever I'm awake) to retrieve a user's song listening history, load the responses into a database, apply transformations and visualize the metrics in a dashboard. Since the dataset is small and this doesn't need to be running 24/7 this is all built and hosted locally to avoid any cost.
+Deep dive into a user's song listening history to retrieve information about top artists, top tracks, top genres, and more. This is a personal side project for fun to recreate Spotify Wrapped but at a more frequent cadence to get quicker and more detailed insights. This pipeline calls the Spotify API every 30 minutes from hours 0-6 and 14-23 UTC (basically whenever I'm awake) to retrieve a user's song listening history, load the responses into a database, apply transformations and visualize the metrics in a dashboard. Since the dataset is small and this doesn't need to be running 24/7 this is all built and hosted locally to avoid any cost.
 
 ## Tools & Technologies
 
