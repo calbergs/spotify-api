@@ -145,7 +145,7 @@ Deep dive into a user's song listening history to retrieve information about top
   dbt docs serve --port 8001
   ```
 
-### Set up Slack notifications for any Airflow task failures
+### Enable Slack notifications for any Airflow task failures
 
 - Create a channel in your workspace where the alerts will be sent
 - Go to api.slack.com/apps and click on "Create New App" then click on "From scratch"
@@ -161,7 +161,7 @@ Deep dive into a user's song listening history to retrieve information about top
   - Connection Type: HTTP
   - Host: https://hooks.slack.com/services/
   - Password: /T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
-- Apply the code into the DAG script to enable alerts
+- Implement the code into the DAG script to enable alerts
  
 ### Set up Metabase
 
