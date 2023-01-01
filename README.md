@@ -83,6 +83,10 @@ Deep dive into a user's song listening history to retrieve information about top
   docker-compose up
   ```
 - Airflow is now available on http://localhost:8080/home
+- Depending on where your dbt project is installed a new volume will need to be added in the docker-compose.yaml file in order for dbt to run in Airflow
+  ```
+  - ./operators/dbt:/opt/airflow/operators/dbt
+  ```
 
 ### Set up Airflow connection to Postgres
 
