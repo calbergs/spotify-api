@@ -72,11 +72,6 @@ with DAG(
     default_args=args
 ) as dag:
 
-    extract_spotify_data = BashOperator(
-        task_id='extract_spotify_data',
-        bash_command='python3 /opt/airflow/operators/main.py'
-    )
-
     create_if_not_exists_spotify_genres_table = PostgresOperator(
         task_id="create_if_not_exists_spotify_genres_table",
         postgres_conn_id="postgres_localhost",
@@ -87,6 +82,11 @@ with DAG(
         task_id="create_if_not_exists_spotify_songs_table",
         postgres_conn_id="postgres_localhost",
         sql="sql/create_spotify_songs.sql"
+    )
+
+    extract_spotify_data = BashOperator(
+        task_id='extract_spotify_data',
+        bash_command='python3 /opt/airflow/operators/main.py'
     )
 
     load_genres = PythonOperator(
