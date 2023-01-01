@@ -98,12 +98,12 @@ Deep dive into a user's song listening history to retrieve information about top
 - Go to the Airflow UI and click on Admin>Connections then click on the + sign
 - Fill in the connection with the below details and click save:
   - Conn Id: postgres_localhost
-  -Conn Type: Postgres
-  -Host: host.docker.internal
-  -Schema: spotify
-  -Login:
-  -Password:
-  -Port: 5432
+  - Conn Type: Postgres
+  - Host: host.docker.internal
+  - Schema: spotify
+  - Login:
+  - Password:
+  - Port: 5432
 
 ### Install dbt Core with Homebrew (or your method of choice)
 
