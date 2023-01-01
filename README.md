@@ -36,7 +36,7 @@ Deep dive into a user's song listening history to retrieve information about top
 
 ## Further Improvements (Work In Progress)
 
-- Implement data quality checks to catch any errors in the dataset
+- Implement data quality checks to catch any potential errors in the dataset
 - Create unit tests to ensure pipeline is running as intended
 - Include CI/CD
 - Create more visualizations to uncover more insights
