@@ -1,4 +1,4 @@
-### Set up Metabase
+### Install Metabase
 
 - Download the Metabase [**JAR file**](https://www.metabase.com/start/oss/) (or your method of choice)
 - Create a new directory and move the Metabase JAR file into it
