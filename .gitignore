@@ -7,11 +7,11 @@ secrets.py
 dev_script.py
 test*
 .user.yml
-dbt.md
-airflow_docker.md
-postgres.md
-slack_notifications.md
-metabase.md
+1_airflow_docker.md
+2_postgres.md
+3_dbt.md
+4_slack_notifications.md
+5_metabase.md
 spotify.drawio
 
 # Airflow
