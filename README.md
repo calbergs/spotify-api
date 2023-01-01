@@ -17,7 +17,7 @@ Deep dive into a user's song listening history to retrieve information about top
 
 ## Architecture
 
-![spotify_architecture drawio](https://user-images.githubusercontent.com/60953643/210160261-98c3ff9e-3c54-4407-b758-828322fbc2ad.png)
+![spotify_architecture drawio](https://user-images.githubusercontent.com/60953643/210160555-0a6cddbe-f5b9-4ef3-913c-7e105694bf33.svg)
 
 ## Dashboard
 <img width="1726" alt="Screenshot 2022-12-31 at 7 41 09 PM" src="https://user-images.githubusercontent.com/60953643/210158921-0024a44f-2273-40dd-b974-cede87ef5d69.png">
@@ -157,13 +157,14 @@ Deep dive into a user's song listening history to retrieve information about top
   - Connection Type: HTTP
   - Host: https://hooks.slack.com/services/
   - Password: /T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
+- Apply the code into the DAG script to enable alerts
  
 ### Set up Metabase
 
 - Download the Metabase [**JAR file**](https://www.metabase.com/start/oss/) (or your method of choice)
 - Create a new directory and move the Metabase JAR file into it
 - Ensure the [**latest Java version**](https://www.oracle.com/java/technologies/downloads/#jdk19-mac) is downloaded
-- Change into your new Metabase directory and run the JAR
+- cd into the new Metabase directory and run the JAR
   ```
   java -jar metabase.jar
   ```
