@@ -132,6 +132,14 @@ Deep dive into a user's song listening history to retrieve information about top
   ```
   dbt run
   ```
+- Generate the docs for the dbt project
+  ```
+  dbt docs generate
+  ```
+- Serve the docs on a webserver using port 8001
+  ```
+  dbt docs serve --port 8001
+  ```
 
 ### Set up Slack notifications for any Airflow task failures
 
