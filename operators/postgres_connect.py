@@ -1,3 +1,7 @@
+"""
+Connects to the Postgres database
+"""
+
 import psycopg2
 from secrets import pg_user, pg_password, host, port, dbname
 
