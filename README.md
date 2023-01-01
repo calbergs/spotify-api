@@ -27,11 +27,11 @@ Deep dive into a user's song listening history to retrieve information about top
 
 ## Setup
 
-- [Spotify API Access](https://github.com/calbergs/spotify-api/blob/master/setup/spotify_api_access.md)
+- [Get Spotify API Access](https://github.com/calbergs/spotify-api/blob/master/setup/spotify_api_access.md)
 - [Build Docker Containers for Airflow](https://github.com/calbergs/spotify-api/blob/master/setup/airflow_docker.md)
-- [Set up Airflow connection to Postgres](https://github.com/calbergs/spotify-api/blob/master/setup/postgres.md)
+- [Set up Airflow Connection to Postgres](https://github.com/calbergs/spotify-api/blob/master/setup/postgres.md)
 - [Install dbt Core](https://github.com/calbergs/spotify-api/blob/master/setup/dbt.md)
-- [Enable Slack notifications for any Airflow task failures](https://github.com/calbergs/spotify-api/blob/master/setup/slack_notifications.md)
+- [Enable Airflow Slack Notifications](https://github.com/calbergs/spotify-api/blob/master/setup/slack_notifications.md)
 - [Set up Metabase](https://github.com/calbergs/spotify-api/blob/master/setup/metabase.md)
 
 ## Further Improvements (Work In Progress)
