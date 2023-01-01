@@ -58,7 +58,110 @@ Deep dive into a user's song listening history to retrieve information about top
   - <your_client_id>:<your_client_secret>
   - Using the format above convert to a base 64 encoded string by going to [**base64encode.org**](https://www.base64encode.org/), pasting in the string, and then clicking encode. Ensure encode is selected and not decode.
   - This will be defined as base_64 in our code and will be used when we generate a new access token on each run
+  
+### Build Docker Containers for Airflow
 
+- Check if you have enough memory (need at least 4GB)
+  ```
+  docker run --rm "debian:bullseye-slim" bash -c 'numfmt --to iec $(echo $(($(getconf _PHYS_PAGES) * $(getconf PAGE_SIZE))))'
+  ```
+- Fetch docker-compose.yaml
+  ```
+  curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.5.0/docker-compose.yaml'
+  ```
+- Make the directories and set the user
+  ```
+  mkdir -p ./dags ./logs ./plugins
+  echo -e "AIRFLOW_UID=$(id -u)" > .env
+  ```
+- Initialize the database
+  ```
+  docker compose up airflow-init
+  ```
+- Start all services
+  ```
+  docker-compose up
+  ```
+- Airflow is now available on http://localhost:8080/home
+
+### Set up Airflow connection to Postgres
+
+- Add ports to the section under services and Postgres in the docker-compose.yaml file like below:
+  ```
+  ports:
+      - 5432:5432
+  ```
+- Download DBeaver (or your tool of choice)
+    - Create a new Postgres connection and add the username and password
+    - Test the connection, it may ask you to download the Postgres JDBC driver if you don't have it. Download and test again.
+    - Once connection is successful create a new database named 'spotify'
+- Go to the Airflow UI and click on Admin>Connections then click on the + sign
+- Fill in the connection with the below details and click save:
+  - Conn Id: postgres_localhost
+  -Conn Type: Postgres
+  -Host: host.docker.internal
+  -Schema: spotify
+  -Login:
+  -Password:
+  -Port: 5432
+
+### Install dbt Core with Homebrew (or your method of choice)
+
+- Run the below commands:
+  ```
+  brew update
+  brew install git
+  brew tap dbt-labs/dbt
+  ```
+- Identify your [**adapter**](https://docs.getdbt.com/docs/supported-data-platforms) (we are using Postgres) and install:
+  ```
+  brew install dbt-postgres
+  ```
+- cd to the directory where you want to have dbt installed and initialize the project
+  ```
+  dbt init <your-folder-path>
+  ```
+- Update the profiles.yml file found in Users/<your-username>/.dbt/
+  - Update all the appropriate configurations based on the [**dbt setup guide**](https://docs.getdbt.com/reference/warehouse-setups/postgres-setup)
+- Go to the dbt_project.yml file and make sure the profile configuration matches with the one in the profiles.yml file
+- Ensure the database setup was done correctly
+  ```
+  dbt debug
+  ```
+- Test that dbt is building the models correctly. If successful you can verify the new tables/views in the database
+  ```
+  dbt run
+  ```
+
+### Set up Slack notifications via Airflow
+
+- Create a channel in your workspace where the alerts will be sent
+- Go to api.slack.com/apps and click on "Create New App" then click on "From scratch"
+- Give your app a name and select your workspace where the alerts will be sent then click "Create App"
+- Enable incoming webhooks for your Slack workspace app
+- You can test your webhook from the command line by running the code below (replace with your own key):
+  ```
+  -curl -X POST -H 'Content-type: application/json' --data '{"text":"Hello, World!"}' https://hooks.slack.com/services/00000000000/00000000000/000000000000000000000000
+  ```
+- Go to the Airflow UI and click on Admin>Connections then click on the + sign
+- Fill in the connection with the below details and click save (replace password with your credentials):
+  - Connection Id: slack
+  - Connection Type: HTTP
+  - Host: https://hooks.slack.com/services/
+  - Password: /T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
+ 
+### Set up Metabase
+
+- Download Metabase via a [**JAR file**](https://www.metabase.com/start/oss/) as Docker doesn't work on M1 Macs yet
+- Create a new directory and move the Metabase JAR file into it
+- Ensure the [**latest Java version**](https://www.oracle.com/java/technologies/downloads/#jdk19-mac) is downloaded
+- Change into your new Metabase directory and run the JAR
+  ```
+  java -jar metabase.jar
+  ```
+- Metabase is now available on http://localhost:3000/setup
+- Set up the connection and use host: localhost
+  
 ## Further Improvements (Work In Progress)
 
 - Implement data quality checks to catch any errors in the dataset
