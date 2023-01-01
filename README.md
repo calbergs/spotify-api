@@ -133,7 +133,7 @@ Deep dive into a user's song listening history to retrieve information about top
   dbt run
   ```
 
-### Set up Slack notifications via Airflow
+### Set up Slack notifications for any Airflow task failures
 
 - Create a channel in your workspace where the alerts will be sent
 - Go to api.slack.com/apps and click on "Create New App" then click on "From scratch"
