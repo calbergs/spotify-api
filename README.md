@@ -19,6 +19,13 @@ Deep dive into a user's song listening history to retrieve information about top
 
 ![spotify drawio](https://user-images.githubusercontent.com/60953643/210160621-c7213f9d-2b9f-42ad-b8b1-697403bf6497.svg)
 
+- main.py script is triggered every 30 minutes via Airflow to call the Spotify API and retrieve the most recently listened songs. The script will first make a connection to the Postgres database to check for the latest listened time. This will then be passed as a parameter when we call the Spotify API to only pull back data from after our last listened track time. The script will pull back recently listened songs as well as the corresponding genres
+- The responses are then saved as CSV files in 'YYYY-MM-DD.csv' format. This file we keep getting appended with the most recently played songs for the respective date. The folder structure is partitioned by year and month (YYYY/MM/YYYY-MM-DD.csv)
+- The incremental data is then copied into the Postgres Database into the respective tables, spotify_songs and spotify_genres.
+- dbt run task is then triggered to run transformations on top of our staging data to produce analytical and reporting tables/views.
+- dbt test will run after successful completion of dbt run to ensure all tests pass.
+- The tables/views are then fed into Metabase and the metrics are visualized through a dashboard.
+
 ## Dashboard
 <img width="1726" alt="Screenshot 2022-12-31 at 7 41 09 PM" src="https://user-images.githubusercontent.com/60953643/210158921-0024a44f-2273-40dd-b974-cede87ef5d69.png">
 <img width="1723" alt="Screenshot 2022-12-31 at 7 41 24 PM" src="https://user-images.githubusercontent.com/60953643/210158923-6050b65d-9955-448d-ac52-7556e0900c7d.png">
