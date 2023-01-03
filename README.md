@@ -44,6 +44,7 @@ Deep dive into a user's song listening history to retrieve information about top
 
 ## Further Improvements (Work In Progress)
 
+- Create a BranchPythonOperator to check for any new data from the API first before continuing with the other downstream tasks. If the payload is empty then proceed diretly to the end task.
 - Implement data quality checks to catch any potential errors in the dataset
 - Create unit tests to ensure pipeline is running as intended
 - Include CI/CD
