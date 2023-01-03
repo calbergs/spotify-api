@@ -47,5 +47,5 @@ Deep dive into a user's song listening history to retrieve information about top
 - Implement data quality checks to catch any potential errors in the dataset
 - Create unit tests to ensure pipeline is running as intended
 - Include CI/CD
-- Create more visualizations to uncover more insights
-- Whenever Spotify allows requesting historical data implement backfill capability (current API only allows requesting the 50 most recently played tracks)
+- Create more visualizations to uncover further insights once Spotify send back my entire songs listening history from 10+ years back to the current date (this needed to be requested seprately since the current API only allows requesting the 50 most recently played tracks)
+- If and whenever Spotify allows requesting historical data implement backfill capability
