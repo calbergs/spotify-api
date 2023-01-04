@@ -17,3 +17,11 @@ models:
         tests:
           - unique
           - not_null
+  - name: rpt_weekly_discovers
+    description: "New artists discovered in the current week"
+    columns:
+      - name: artist_name
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
