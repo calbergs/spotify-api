@@ -20,6 +20,7 @@ final as (
         artist_genre,
         song_duration_mins,
         song_link,
+        played_date,
         last_updated_datetime
 
     from listening_activity
