@@ -15,8 +15,8 @@ curr as (
 	select distinct
 		artist_name,
 		artist_id,
-		count(*) over(partition by artist_id) as times_listened
-		,max(played_at) over (partition by artist_id) as last_listened_time
+		count(artist_id) over(partition by artist_id) as times_listened,
+		max(played_at) over (partition by artist_id) as last_listened_time
 
 	from analytical.fct_listening_activity
 
