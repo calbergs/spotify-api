@@ -28,10 +28,11 @@ Deep dive into a user's song listening history to retrieve information about top
 - Throughout this entire process if any Airflow task fails an automatic Slack alert will be sent to a custom Slack channel that was created.
 
 ## Dashboard
-<img width="1726" alt="Screenshot 2022-12-31 at 7 41 09 PM" src="https://user-images.githubusercontent.com/60953643/210158921-0024a44f-2273-40dd-b974-cede87ef5d69.png">
-<img width="1723" alt="Screenshot 2022-12-31 at 7 41 24 PM" src="https://user-images.githubusercontent.com/60953643/210158923-6050b65d-9955-448d-ac52-7556e0900c7d.png">
-<img width="1721" alt="Screenshot 2022-12-31 at 7 41 36 PM" src="https://user-images.githubusercontent.com/60953643/210158927-c1f5e65a-e391-4e25-b6cf-7b23362f4439.png">
-<img width="1725" alt="Screenshot 2022-12-31 at 7 41 44 PM" src="https://user-images.githubusercontent.com/60953643/210158928-6fc80f5d-8942-462f-846a-e380820aebfd.png">
+<img width="1728" alt="Screenshot 2023-01-05 at 4 55 48 PM" src="https://user-images.githubusercontent.com/60953643/210896053-c92c565d-c46d-427f-8eac-5acebdcfe253.png">
+<img width="1728" alt="Screenshot 2023-01-05 at 4 56 03 PM" src="https://user-images.githubusercontent.com/60953643/210896070-3ccb3f78-38d0-4111-96fc-6b1a47986ec1.png">
+<img width="1728" alt="Screenshot 2023-01-05 at 4 56 19 PM" src="https://user-images.githubusercontent.com/60953643/210896074-764892ad-c515-47dc-b48b-c7b79d4656c1.png">
+<img width="1728" alt="Screenshot 2023-01-05 at 4 56 34 PM" src="https://user-images.githubusercontent.com/60953643/210896088-39449b09-ea0e-4ca6-8169-3077c2d5a50d.png">
+
 
 ## Setup
 
