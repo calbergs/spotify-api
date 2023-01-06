@@ -20,13 +20,14 @@ Deep dive into a user's song listening history to retrieve information about top
 ![spotify drawio](https://user-images.githubusercontent.com/60953643/210160621-c7213f9d-2b9f-42ad-b8b1-697403bf6497.svg)
 
 #### Process
-- main.py script is triggered every 30 minutes via Airflow to call the Spotify API and retrieve the most recently listened songs. The script will first make a connection to the Postgres database to check for the latest listened time. This will then be passed as a parameter when we call the Spotify API to only pull back data from after our last listened track time. The script will pull back recently listened songs as well as the corresponding genres.
-- The responses are then saved as CSV files in 'YYYY-MM-DD.csv' format. This file we keep getting appended with the most recently played songs for the respective date. The folder structure is partitioned by year and month (YYYY/MM/YYYY-MM-DD.csv).
-- The data is then copied into the Postgres Database into the respective tables, spotify_songs and spotify_genres.
-- dbt run task is then triggered to run transformations on top of our staging data to produce analytical and reporting tables/views.
-- dbt test will run after successful completion of dbt run to ensure all tests pass.
-- The tables/views are then fed into Metabase and the metrics are visualized through a dashboard.
-- Throughout this entire process if any Airflow task fails an automatic Slack alert will be sent to a custom Slack channel that was created.
+1. main.py script is triggered every 30 minutes via Airflow to refresh the access token,  make a connection to the Postgres database to check for the latest listened time, and call the Spotify API to retrieve the most recently played songs and corresponding genres
+2. Responses are then saved as CSV files in 'YYYY-MM-DD.csv' format. These files will keep getting appended with the most recently played songs for the respective date.
+3. The data is then copied into the Postgres Database into the respective tables, spotify_songs and spotify_genres.
+4. dbt run task is then triggered to run transformations on top of our staging data to produce analytical and reporting tables/views.
+5. dbt test will run after successful completion of dbt run to ensure all tests pass.
+6. The tables/views are then fed into Metabase and the metrics are visualized through a dashboard.
+
+Throughout this entire process if any Airflow task fails an automatic Slack alert will be sent to a custom Slack channel that was created.
 
 #### DAG
 <img width="1170" alt="Screenshot 2023-01-05 at 9 32 42 PM" src="https://user-images.githubusercontent.com/60953643/210924715-f3e75b77-30d9-4bb3-81fa-fe2459355c3b.png">
