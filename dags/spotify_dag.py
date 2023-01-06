@@ -1,3 +1,6 @@
+import sys
+sys.path.append('/opt/airflow/operators')
+import copy_to_postgres
 from airflow import DAG
 from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
 from airflow.hooks.base_hook import BaseHook
@@ -34,26 +37,6 @@ def task_fail_slack_alert(context):
     )
     return failed_alert.execute(context=context)
 
-def copy_expert_genres_csv():
-    hook = PostgresHook('postgres_localhost')
-    with hook.get_conn() as connection:
-        hook.copy_expert("""
-        COPY spotify_genres FROM stdin WITH CSV HEADER DELIMITER as ','
-        """,
-        '/opt/airflow/dags/spotify_data/spotify_genres.csv'
-        )
-        connection.commit()
-
-def copy_expert_songs_csv():
-    hook = PostgresHook('postgres_localhost')
-    with hook.get_conn() as connection:
-        hook.copy_expert("""
-        COPY spotify_songs FROM stdin WITH CSV HEADER DELIMITER as ','
-        """,
-        '/opt/airflow/dags/spotify_data/spotify_songs.csv'
-        )
-        connection.commit()
-
 args = {
     'owner': 'airflow',
     'depends_on_past': False,
@@ -72,32 +55,33 @@ with DAG(
     default_args=args
 ) as dag:
 
-    create_if_not_exists_spotify_genres_table = PostgresOperator(
-        task_id="create_if_not_exists_spotify_genres_table",
-        postgres_conn_id="postgres_localhost",
-        sql="sql/create_spotify_genres.sql"
-    )
+    TASK_DEFS = {
+        'songs' : {
+            'path': 'sql/create_spotify_songs.sql'
+        },
+        'genres' : {
+            'path' : 'sql/create_spotify_genres.sql'
+        }
+    }
 
-    create_if_not_exists_spotify_songs_table = PostgresOperator(
-        task_id="create_if_not_exists_spotify_songs_table",
+    create_tables_if_not_exists = {k: PostgresOperator(
+        task_id=f"create_if_not_exists_spotify_{k}_table",
         postgres_conn_id="postgres_localhost",
-        sql="sql/create_spotify_songs.sql"
-    )
+        sql=v["path"]
+        ) for k, v in TASK_DEFS.items()}
 
     extract_spotify_data = BashOperator(
         task_id='extract_spotify_data',
         bash_command='python3 /opt/airflow/operators/main.py'
     )
 
-    load_genres = PythonOperator(
-        task_id="load_genres",
-        python_callable=copy_expert_genres_csv
-    )
-
-    load_songs = PythonOperator(
-        task_id="load_songs",
-        python_callable=copy_expert_songs_csv
-    )
+    load_tables = {k: PythonOperator(
+        task_id=f"load_{k}",
+        python_callable=copy_to_postgres.copy_expert_csv,
+        op_kwargs={
+            'file': f'spotify_{k}'
+        }
+        ) for k, v in TASK_DEFS.items()}
 
     dbt_run = DbtRunOperator(
         task_id="dbt_run",
@@ -121,9 +105,9 @@ with DAG(
 
     (
     start_task
-    >> [create_if_not_exists_spotify_genres_table, create_if_not_exists_spotify_songs_table]
+    >> list(create_tables_if_not_exists.values())
     >> extract_spotify_data
-    >> [load_genres, load_songs]
+    >> list(load_tables.values())
     >> dbt_run
     >> dbt_test
     >> end_task
