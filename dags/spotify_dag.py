@@ -95,6 +95,10 @@ with DAG(
         profiles_dir="/opt/airflow/operators/dbt/"
     )
 
+    continue_task = DummyOperator(
+        task_id="continue"
+    )
+
     start_task = DummyOperator(
         task_id="start"
     )
@@ -105,8 +109,9 @@ with DAG(
 
     (
     start_task
-    >> list(create_tables_if_not_exists.values())
     >> extract_spotify_data
+    >> list(create_tables_if_not_exists.values())
+    >> continue_task
     >> list(load_tables.values())
     >> dbt_run
     >> dbt_test
