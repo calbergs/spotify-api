@@ -19,7 +19,7 @@ Deep dive into a user's song listening history to retrieve information about top
 
 ![spotify drawio](https://user-images.githubusercontent.com/60953643/210160621-c7213f9d-2b9f-42ad-b8b1-697403bf6497.svg)
 
-#### Process
+#### Data Flow
 1. main.py script is triggered every 30 minutes via Airflow to refresh the access token,  make a connection to the Postgres database to check for the latest listened time, and call the Spotify API to retrieve the most recently played songs and corresponding genres.
 2. Responses are saved as CSV files in 'YYYY-MM-DD.csv' format. These files will keep getting appended with the most recently played songs for the respective date.
 3. Data is copied into the Postgres Database into the respective tables, spotify_songs and spotify_genres.
