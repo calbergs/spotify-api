@@ -20,7 +20,7 @@ models:
   - name: rpt_weekly_discovers
     description: "New artists discovered in the current week"
     columns:
-      - name: artist_name
+      - name: artist_id
         description: "The primary key for this table"
         tests:
           - unique
