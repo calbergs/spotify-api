@@ -34,25 +34,14 @@ curr as (
 	where cast(date_trunc('week', played_date + interval '1 day') - interval '1 day' as date) < cast(date_trunc('week', current_date + interval '1 day') - interval '1 day' as date) 
 )
 
-,final as (
-
-	select
-		curr.artist_name,
-		times_listened,
-		row_number() over (order by times_listened desc, last_listened_time desc) as rnk
-
-	from curr
-
-	left join prev
-        on curr.artist_id = prev.artist_id
-
-	where prev.artist_id is null
-)
-
 select
-	artist_name,
+	curr.artist_name,
+	curr.artist_id,
 	times_listened
 
-from final
+from curr
 
-order by rnk
+left join prev
+	on curr.artist_id = prev.artist_id
+
+where prev.artist_id is null
