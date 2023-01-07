@@ -25,7 +25,7 @@ final as (
 		extract(year from songs.played_at_cst) as played_at_year,
 		extract(month from songs.played_at_cst) as played_at_month,
 		extract(day from songs.played_at_cst) as played_at_day,
-		DATE_PART('week', songs.played_at_cst) as played_at_week_number,
+		DATE_PART('week', cast(date_trunc('week', songs.played_at_cst + interval '1 day') - interval '1 day' as date)) as played_at_week_number,
 		extract(hour from songs.played_at_cst) as played_at_hour,
 		songs.song_name,
 		songs.artist_name,
