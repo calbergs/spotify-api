@@ -21,7 +21,7 @@ Deep dive into a user's song listening history to retrieve information about top
 
 #### Data Flow
 1. main.py script is triggered every 30 minutes via Airflow to refresh the access token,  make a connection to the Postgres database to check for the latest listened time, and call the Spotify API to retrieve the most recently played songs and corresponding genres.
-2. Responses are saved as CSV files in 'YYYY-MM-DD.csv' format. These files will keep getting appended with the most recently played songs for the respective date.
+2. Responses are saved as CSV files in 'YYYY-MM-DD.csv' format. These are saved on the local file system and act as our replayable source since the Spotify API only allows requesting the 50 most recently played songs and not any historical data. These files will keep getting appended with the most recently played songs for the respective date.
 3. Data is copied into the Postgres Database into the respective tables, spotify_songs and spotify_genres.
 4. dbt run task is triggered to run transformations on top of the staging data to produce analytical and reporting tables/views.
 5. dbt test will run after successful completion of dbt run to ensure all tests pass.
