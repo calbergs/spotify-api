@@ -9,6 +9,7 @@ test*
 .user.yml
 references.md
 spotify.drawio
+**/extended_streaming_history/
 
 # Airflow
 **/logs/*
