@@ -10,7 +10,7 @@ Deep dive into a user's song listening history to retrieve information about top
 
 - Containerization - [**Docker**](https://www.docker.com), [**Docker Compose**](https://docs.docker.com/compose/)
 - Orchestration - [**Airflow**](https://airflow.apache.org)
-- Data Warehouse - [**PostgreSQL**](https://www.postgresql.org/)
+- Database - [**PostgreSQL**](https://www.postgresql.org/)
 - Transformation - [**dbt**](https://www.getdbt.com)
 - Data Visualization - [**Metabase**](https://www.metabase.com/)
 - Language - [**Python**](https://www.python.org)
@@ -45,12 +45,12 @@ Throughout this entire process if any Airflow task fails an automatic Slack aler
 
 ## Setup
 
-- [Get Spotify API Access](https://github.com/calbergs/spotify-api/blob/master/setup/spotify_api_access.md)
-- [Build Docker Containers for Airflow](https://github.com/calbergs/spotify-api/blob/master/setup/airflow_docker.md)
-- [Set Up Airflow Connection to Postgres](https://github.com/calbergs/spotify-api/blob/master/setup/postgres.md)
-- [Install dbt Core](https://github.com/calbergs/spotify-api/blob/master/setup/dbt.md)
-- [Enable Airflow Slack Notifications](https://github.com/calbergs/spotify-api/blob/master/setup/slack_notifications.md)
-- [Install Metabase](https://github.com/calbergs/spotify-api/blob/master/setup/metabase.md)
+1. [Get Spotify API Access](https://github.com/calbergs/spotify-api/blob/master/setup/spotify_api_access.md)
+2. [Build Docker Containers for Airflow](https://github.com/calbergs/spotify-api/blob/master/setup/airflow_docker.md)
+3. [Set Up Airflow Connection to Postgres](https://github.com/calbergs/spotify-api/blob/master/setup/postgres.md)
+4. [Install dbt Core](https://github.com/calbergs/spotify-api/blob/master/setup/dbt.md)
+5. [Enable Airflow Slack Notifications](https://github.com/calbergs/spotify-api/blob/master/setup/slack_notifications.md)
+6. [Install Metabase](https://github.com/calbergs/spotify-api/blob/master/setup/metabase.md)
 
 ## Further Improvements (Work In Progress)
 
