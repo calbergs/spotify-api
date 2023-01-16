@@ -25,3 +25,11 @@ models:
         tests:
           - unique
           - not_null
+  - name: rpt_hour_of_week
+    description: "Hour of week heatmap on listening activity"
+    columns:
+      - name: (played_at_day_of_week || played_at_hour)
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
