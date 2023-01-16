@@ -18,7 +18,7 @@ curr as (
 		count(artist_id) over(partition by artist_id) as times_listened,
 		max(played_at) over (partition by artist_id) as last_listened_time
 
-	from analytical.fct_listening_activity
+	from listening_activity
 
 	where cast(date_trunc('week', played_date + interval '1 day') - interval '1 day' as date) = cast(date_trunc('week', current_date + interval '1 day') - interval '1 day' as date)
 )
@@ -29,7 +29,7 @@ curr as (
 		artist_name,
 		artist_id
 
-	from analytical.fct_listening_activity
+	from listening_activity
 
 	where cast(date_trunc('week', played_date + interval '1 day') - interval '1 day' as date) < cast(date_trunc('week', current_date + interval '1 day') - interval '1 day' as date) 
 )
