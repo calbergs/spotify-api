@@ -10,6 +10,7 @@ test*
 references.md
 spotify.drawio
 **/extended_streaming_history/
+backfill_extended_streaming_history.py
 
 # Airflow
 **/logs/*
