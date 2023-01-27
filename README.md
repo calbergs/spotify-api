@@ -4,7 +4,7 @@ Data pipeline that extracts a user's song listening history from the Spotify API
 
 ## Objective
 
-Deep dive into a user's song listening history to retrieve information about top artists, top tracks, top genres, and more. This is a personal side project for fun to recreate Spotify Wrapped but at a more frequent cadence to get quicker and more detailed insights. This pipeline calls the Spotify API every 30 minutes from hours 0-6 and 14-23 UTC (basically whenever I'm awake) to extract a user's song listening history, load the responses into a database, apply transformations and visualize the metrics in a dashboard. Since the dataset is small and this doesn't need to be running 24/7 this is all built using open source tools and hosted locally to avoid any cost.
+Deep dive into a user's song listening history to retrieve information about top artists, top tracks, top genres, and more. This is a personal side project for fun to recreate Spotify Wrapped but at a more frequent cadence to get quicker and more detailed insights. This pipeline calls the Spotify API every hour from hours 0-6 and 14-23 UTC (basically whenever I'm awake) to extract a user's song listening history, load the responses into a database, apply transformations and visualize the metrics in a dashboard. Since the dataset is small and this doesn't need to be running 24/7 this is all built using open source tools and hosted locally to avoid any cost.
 
 ## Tools & Technologies
 
@@ -20,7 +20,7 @@ Deep dive into a user's song listening history to retrieve information about top
 ![spotify drawio](https://user-images.githubusercontent.com/60953643/210160621-c7213f9d-2b9f-42ad-b8b1-697403bf6497.svg)
 
 #### Data Flow
-1. main.py script is triggered every 30 minutes via Airflow to refresh the access token,  make a connection to the Postgres database to check for the latest listened time, and call the Spotify API to retrieve the most recently played songs and corresponding genres.
+1. main.py script is triggered every hour (from hours 0-6 and 14-23 UTC) via Airflow to refresh the access token,  make a connection to the Postgres database to check for the latest listened time, and call the Spotify API to retrieve the most recently played songs and corresponding genres.
 2. Responses are saved as CSV files in 'YYYY-MM-DD.csv' format. These are saved on the local file system and act as our replayable source since the Spotify API only allows requesting the 50 most recently played songs and not any historical data. These files will keep getting appended with the most recently played songs for the respective date.
 3. Data is copied into the Postgres Database into the respective tables, spotify_songs and spotify_genres.
 4. dbt run task is triggered to run transformations on top of the staging data to produce analytical and reporting tables/views.
