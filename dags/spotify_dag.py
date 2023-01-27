@@ -49,7 +49,7 @@ args = {
 
 with DAG(
     dag_id='spotify_dag',
-    schedule_interval='*/30 0-6,14-23 * * *',
+    schedule_interval='0 0-6,14-23 * * *',
     max_active_runs=1,
     catchup=False,
     default_args=args
