@@ -26,6 +26,7 @@ Deep dive into a user's song listening history to retrieve information about top
 4. dbt run task is triggered to run transformations on top of the staging data to produce analytical and reporting tables/views.
 5. dbt test will run after successful completion of dbt run to ensure all tests pass.
 6. Tables/views are fed into Metabase and the metrics are visualized through a dashboard.
+7. Email subscription is set up in Metabase to send a weekly summary every Sunday.
 
 Throughout this entire process if any Airflow task fails an automatic Slack alert will be sent to a custom Slack channel that was created.
 
