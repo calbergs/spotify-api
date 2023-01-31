@@ -1,4 +1,4 @@
-### Install Metabase
+# Install Metabase
 
 - Download the Metabase [**JAR file**](https://www.metabase.com/start/oss/) (or your method of choice, JAR file was used as Metabase through Docker wasn't working on M1 Macs at the time of this writing)
 - Create a new directory and move the Metabase JAR file into it

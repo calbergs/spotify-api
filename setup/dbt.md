@@ -1,4 +1,4 @@
-### Install dbt Core with Homebrew (or your method of choice)
+# Install dbt Core with Homebrew (or your method of choice)
 
 - Run the below commands:
   ```

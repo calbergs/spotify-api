@@ -1,4 +1,4 @@
-### Build Docker Containers for Airflow
+# Build Docker Containers for Airflow
 
 - Check if you have enough memory (need at least 4GB)
   ```

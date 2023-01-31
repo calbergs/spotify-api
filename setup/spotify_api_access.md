@@ -1,4 +1,4 @@
-### Spotify API Access
+# Spotify API Access
 
 - Ensure you have a Spotify account created
 - Register Your Application

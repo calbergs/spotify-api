@@ -1,4 +1,4 @@
-### Set up Airflow connection to Postgres
+# Set up Airflow connection to Postgres
 
 - Add ports to the section under services and Postgres in the docker-compose.yaml file like below:
   ```
