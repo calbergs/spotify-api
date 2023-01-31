@@ -1,7 +1,7 @@
 import sys
 
 sys.path.append("/opt/airflow/operators")
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 import copy_to_postgres
 from airflow import DAG
@@ -39,6 +39,7 @@ def task_fail_slack_alert(context):
     )
     return failed_alert.execute(context=context)
 
+
 args = {
     "owner": "airflow",
     "depends_on_past": False,
@@ -46,7 +47,7 @@ args = {
     "retries": 1,
     "retry_delay": timedelta(minutes=1),
     "on_success_callback": None,
-    "on_failure_callback": task_fail_slack_alert
+    "on_failure_callback": task_fail_slack_alert,
 }
 
 with DAG(
@@ -58,12 +59,8 @@ with DAG(
 ) as dag:
 
     TASK_DEFS = {
-        "songs" : {
-            "path": "sql/create_spotify_songs.sql"
-        },
-        "genres" : {
-            "path" : "sql/create_spotify_genres.sql"
-        }
+        "songs": {"path": "sql/create_spotify_songs.sql"},
+        "genres": {"path": "sql/create_spotify_genres.sql"},
     }
 
     create_tables_if_not_exists = {
@@ -77,7 +74,7 @@ with DAG(
 
     extract_spotify_data = BashOperator(
         task_id="extract_spotify_data",
-        bash_command="python3 /opt/airflow/operators/main.py"
+        bash_command="python3 /opt/airflow/operators/main.py",
     )
 
     load_tables = {

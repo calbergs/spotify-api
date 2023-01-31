@@ -60,7 +60,7 @@ class RetrieveSongs:
             "https://api.spotify.com/v1/me/player/recently-played?limit=50&after={time}".format(
                 time=latest_timestamp
             ),
-            headers = headers
+            headers=headers,
         )
 
         song_data = song_response.json()
@@ -108,7 +108,7 @@ class RetrieveSongs:
 
         song_df = pd.DataFrame(
             song_dict,
-            columns = [
+            columns=[
                 "played_at_utc",
                 "played_date_utc",
                 "song_name",
@@ -120,7 +120,7 @@ class RetrieveSongs:
                 "album_id",
                 "artist_id",
                 "track_id",
-            ]
+            ],
         )
 
         last_updated_datetime_utc = dt.datetime.utcnow()
@@ -132,7 +132,7 @@ class RetrieveSongs:
         song_df.to_csv(f"{songs}.csv", index=False)
 
         for date in set(song_df["played_date_utc"]):
-            played_dt = datetime.strptime(date, '%Y-%m-%d')
+            played_dt = datetime.strptime(date, "%Y-%m-%d")
             date_year = played_dt.year
             date_month = played_dt.month
             output_song_dir = Path(f"{songs}/{date_year}/{date_month}")

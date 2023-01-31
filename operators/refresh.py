@@ -3,6 +3,7 @@ Generates a new access token on each run
 """
 
 from secrets import base_64, refresh_token
+
 import requests
 
 
@@ -15,8 +16,8 @@ class RefreshToken:
         query = "https://accounts.spotify.com/api/token"
         response = requests.post(
             query,
-            data = {"grant_type": "refresh_token", "refresh_token": refresh_token},
-            headers = {"Authorization": "Basic " + base_64},
+            data={"grant_type": "refresh_token", "refresh_token": refresh_token},
+            headers={"Authorization": "Basic " + base_64},
         )
 
         response_json = response.json()
