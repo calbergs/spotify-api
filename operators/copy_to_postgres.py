@@ -1,3 +1,7 @@
+"""
+Copies CSV into Postgres
+"""
+
 from airflow.hooks.postgres_hook import PostgresHook
 
 
