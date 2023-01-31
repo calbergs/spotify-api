@@ -38,11 +38,11 @@ Throughout this entire process if any Airflow task fails an automatic Slack aler
 
 
 ## Dashboard
-<img width="1728" alt="Screenshot 2023-01-05 at 4 55 48 PM" src="https://user-images.githubusercontent.com/60953643/210896053-c92c565d-c46d-427f-8eac-5acebdcfe253.png">
-<img width="1728" alt="Screenshot 2023-01-05 at 4 56 03 PM" src="https://user-images.githubusercontent.com/60953643/210896070-3ccb3f78-38d0-4111-96fc-6b1a47986ec1.png">
-<img width="1376" alt="Screenshot 2023-01-24 at 10 18 42 PM" src="https://user-images.githubusercontent.com/60953643/214479012-43aeb794-de27-4e58-ba81-0cd68f083edd.png">
-<img width="1728" alt="Screenshot 2023-01-05 at 4 56 19 PM" src="https://user-images.githubusercontent.com/60953643/210896074-764892ad-c515-47dc-b48b-c7b79d4656c1.png">
-<img width="1728" alt="Screenshot 2023-01-05 at 4 56 34 PM" src="https://user-images.githubusercontent.com/60953643/210896088-39449b09-ea0e-4ca6-8169-3077c2d5a50d.png">
+<img width="1472" alt="Screenshot 2023-01-31 at 12 02 56 PM" src="https://user-images.githubusercontent.com/60953643/215845338-5e2f7677-8c0b-4e02-af6f-9742dbdb41e7.png">
+<img width="1656" alt="Screenshot 2023-01-31 at 12 03 12 PM" src="https://user-images.githubusercontent.com/60953643/215845354-6dec50ea-635a-4bbd-9c65-eb254b2877cf.png">
+<img width="1376" alt="Screenshot 2023-01-24 at 10 18 42 PM" src="https://user-images.githubusercontent.com/60953643/215845410-f1a9753f-39aa-4f90-b769-a11104c01962.png">
+<img width="1655" alt="Screenshot 2023-01-31 at 12 03 24 PM" src="https://user-images.githubusercontent.com/60953643/215845428-7831d936-bccf-46ea-9848-c527da89a5e9.png">
+<img width="1655" alt="Screenshot 2023-01-31 at 12 03 36 PM" src="https://user-images.githubusercontent.com/60953643/215845447-50e5af73-3a41-432f-a5a3-40932b1f153b.png">
 
 
 ## Setup
