@@ -32,7 +32,7 @@ class RetrieveSongs:
         max_played_at_utc = cur.fetchall()[0][0]
 
         # If the spotify_songs table is empty, grab the earliest data we can. Set at t - 90 days for now.
-        if max_played_at_utc == None:
+        if max_played_at_utc is None:
             today = dt.datetime.now()
             previous_date = today - dt.timedelta(days=90)
             previous_date_unix_timestamp = int(previous_date.timestamp()) * 1000
@@ -180,8 +180,7 @@ class RetrieveSongs:
         }
 
         artist_genre_df = pd.DataFrame(
-            artist_dict,
-            columns = ["artist_id", "artist_name", "artist_genre"]
+            artist_dict, columns=["artist_id", "artist_name", "artist_genre"]
         )
 
         artist_genre_df.to_csv(f"{genres_tmp}.csv", index=False)
