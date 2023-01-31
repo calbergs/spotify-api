@@ -2,9 +2,9 @@
 Generates a new access token on each run
 """
 
-import json
+from secrets import base_64, refresh_token
 import requests
-from secrets import refresh_token, base_64
+
 
 class RefreshToken:
     def __init__(self):
@@ -15,17 +15,13 @@ class RefreshToken:
         query = "https://accounts.spotify.com/api/token"
         response = requests.post(
             query,
-            data = {
-                "grant_type": "refresh_token",
-                "refresh_token": refresh_token
-            },
-            headers = {
-                "Authorization": "Basic " + base_64
-            }
+            data = {"grant_type": "refresh_token", "refresh_token": refresh_token},
+            headers = {"Authorization": "Basic " + base_64},
         )
 
         response_json = response.json()
         return response_json["access_token"]
+
 
 if __name__ == "__main__":
     new_token = RefreshToken()

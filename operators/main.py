@@ -3,23 +3,22 @@ Makes requests to the Spotify API to retrieve recently played songs and the corr
 """
 
 import datetime as dt
-import json
 import os.path
-import pandas as pd
-import psycopg2
-import requests
 from datetime import datetime
-from io import StringIO
 from pathlib import Path
+from secrets import spotify_user_id
+
+import pandas as pd
+import requests
 from postgres_connect import ConnectPostgres
 from refresh import RefreshToken
-from secrets import spotify_user_id
 from yaml_load import yaml_loader
+
 
 class RetrieveSongs:
     def __init__(self):
-        self.user_id = spotify_user_id # Spotify username
-        self.spotify_token = "" # Spotify access token
+        self.user_id = spotify_user_id  # Spotify username
+        self.spotify_token = ""  # Spotify access token
 
     # Query the postgres database to get the latest played timestamp
     def get_latest_listened_timestamp(self):
@@ -29,7 +28,6 @@ class RetrieveSongs:
         query = "SELECT MAX(played_at_utc) FROM public.spotify_songs"
 
         cur.execute(query)
-        total_records = cur.rowcount
 
         max_played_at_utc = cur.fetchall()[0][0]
 
@@ -46,19 +44,24 @@ class RetrieveSongs:
     # Extract recently played songs from Spotify API
     def get_songs(self):
         headers = {
-            "Accept" : "application/json",
-            "Content-Type" : "application/json",
-            "Authorization" : "Bearer {}".format(self.spotify_token)
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": "Bearer {}".format(self.spotify_token),
         }
 
         latest_timestamp = RetrieveSongs().get_latest_listened_timestamp()
         config = yaml_loader()
-        songs = config['files']['songs']
-        genres = config['files']['genres']
-        genres_tmp = config['files']['genres_tmp']
+        songs = config["files"]["songs"]
+        genres = config["files"]["genres"]
+        genres_tmp = config["files"]["genres_tmp"]
 
         # Download all songs listened to since the last run or since the earliest listen date defined in the get_latest_listened_timestamp function
-        song_response = requests.get("https://api.spotify.com/v1/me/player/recently-played?limit=50&after={time}".format(time=latest_timestamp), headers = headers)
+        song_response = requests.get(
+            "https://api.spotify.com/v1/me/player/recently-played?limit=50&after={time}".format(
+                time=latest_timestamp
+            ),
+            headers = headers
+        )
 
         song_data = song_response.json()
 
@@ -90,9 +93,9 @@ class RetrieveSongs:
 
         # Prepare a dictionary in order to turn it into a pandas dataframe
         song_dict = {
-            "played_at_utc" : played_at_utc,
-            "played_date_utc" : played_date_utc,
-            "song_name" : song_names,
+            "played_at_utc": played_at_utc,
+            "played_date_utc": played_date_utc,
+            "song_name": song_names,
             "artist_name": artist_names,
             "song_duration_ms": song_durations_ms,
             "song_link": song_links,
@@ -100,38 +103,41 @@ class RetrieveSongs:
             "album_name": album_names,
             "album_id": album_ids,
             "artist_id": artist_ids,
-            "track_id": track_ids
+            "track_id": track_ids,
         }
 
-        song_df = pd.DataFrame(song_dict, columns = [
-            "played_at_utc",
-            "played_date_utc",
-            "song_name",
-            "artist_name",
-            "song_duration_ms",
-            "song_link",
-            "album_art_link",
-            "album_name",
-            "album_id",
-            "artist_id",
-            "track_id"
-        ])
+        song_df = pd.DataFrame(
+            song_dict,
+            columns = [
+                "played_at_utc",
+                "played_date_utc",
+                "song_name",
+                "artist_name",
+                "song_duration_ms",
+                "song_link",
+                "album_art_link",
+                "album_name",
+                "album_id",
+                "artist_id",
+                "track_id",
+            ]
+        )
 
         last_updated_datetime_utc = dt.datetime.utcnow()
-        song_df['last_updated_datetime_utc'] = last_updated_datetime_utc
-        song_df = song_df.sort_values('played_at_utc', ascending=True)
+        song_df["last_updated_datetime_utc"] = last_updated_datetime_utc
+        song_df = song_df.sort_values("played_at_utc", ascending=True)
 
         # Remove latest song since last run since this will be a duplicate then write to csv
-        song_df = song_df.iloc[1: , :]
-        song_df.to_csv(f'{songs}.csv', index=False)
+        song_df = song_df.iloc[1:, :]
+        song_df.to_csv(f"{songs}.csv", index=False)
 
-        for date in set(song_df['played_date_utc']):
+        for date in set(song_df["played_date_utc"]):
             played_dt = datetime.strptime(date, '%Y-%m-%d')
             date_year = played_dt.year
             date_month = played_dt.month
-            output_song_dir = Path(f'{songs}/{date_year}/{date_month}')
-            output_song_file = f'{date}.csv'
-            path_to_songs_file = f'{output_song_dir}/{output_song_file}'
+            output_song_dir = Path(f"{songs}/{date_year}/{date_month}")
+            output_song_file = f"{date}.csv"
+            path_to_songs_file = f"{output_song_dir}/{output_song_file}"
             songs_file_exists = os.path.exists(path_to_songs_file)
             print(songs_file_exists)
             # Check to see if file exists. If not create a new file, else append to existing file.
@@ -141,7 +147,9 @@ class RetrieveSongs:
                 curr_song_df.to_csv(path_to_songs_file, index=False)
             else:
                 output_song_dir.mkdir(parents=True, exist_ok=True)
-                song_df.loc[song_df['played_date_utc'] == date].to_csv(f'{output_song_dir}/{date}.csv', index=False)
+                song_df.loc[song_df["played_date_utc"] == date].to_csv(
+                    f"{output_song_dir}/{date}.csv", index=False
+                )
 
         # Retrieve the corresponding genres for the artists in the artist_ids list
         artist_ids_genres = []
@@ -151,7 +159,9 @@ class RetrieveSongs:
         artist_ids_dedup = set(artist_ids)
 
         for id in artist_ids_dedup:
-            artist_response = requests.get("https://api.spotify.com/v1/artists/{id}".format(id=id), headers = headers)
+            artist_response = requests.get(
+                "https://api.spotify.com/v1/artists/{id}".format(id=id), headers=headers
+            )
 
             artist_data = artist_response.json()
 
@@ -166,27 +176,30 @@ class RetrieveSongs:
         artist_dict = {
             "artist_id": artist_ids_genres,
             "artist_name": artist_names,
-            "artist_genre": artist_genres
+            "artist_genre": artist_genres,
         }
 
-        artist_genre_df = pd.DataFrame(artist_dict, columns = [
-            "artist_id",
-            "artist_name",
-            "artist_genre"
-        ])
+        artist_genre_df = pd.DataFrame(
+            artist_dict,
+            columns = ["artist_id", "artist_name", "artist_genre"]
+        )
 
-        artist_genre_df.to_csv(f'{genres_tmp}.csv', index=False)
-        artist_genre_df_nh = pd.read_csv(f'{genres_tmp}.csv', sep=',')
+        artist_genre_df.to_csv(f"{genres_tmp}.csv", index=False)
+        artist_genre_df_nh = pd.read_csv(f"{genres_tmp}.csv", sep=",")
         try:
-            curr_artist_genre_df = pd.read_csv(f'{genres}.csv', sep=',')
+            curr_artist_genre_df = pd.read_csv(f"{genres}.csv", sep=",")
             curr_artist_genre_df = curr_artist_genre_df.append(artist_genre_df_nh)
-            curr_artist_genre_df.drop_duplicates(subset="artist_id", keep="first", inplace=True)
-            curr_artist_genre_df['last_updated_datetime_utc'] = last_updated_datetime_utc
-            curr_artist_genre_df.to_csv(f'{genres}.csv', index=False)
+            curr_artist_genre_df.drop_duplicates(
+                subset="artist_id", keep="first", inplace=True
+            )
+            curr_artist_genre_df[
+                "last_updated_datetime_utc"
+            ] = last_updated_datetime_utc
+            curr_artist_genre_df.to_csv(f"{genres}.csv", index=False)
         except:
-            artist_genre_df_nh['last_updated_datetime_utc'] = last_updated_datetime_utc
-            artist_genre_df_nh.to_csv(f'{genres}.csv', index=False)
-        os.remove(f'{genres_tmp}.csv')
+            artist_genre_df_nh["last_updated_datetime_utc"] = last_updated_datetime_utc
+            artist_genre_df_nh.to_csv(f"{genres}.csv", index=False)
+        os.remove(f"{genres_tmp}.csv")
 
     def call_refresh(self):
         print("Refreshing token...")
@@ -194,6 +207,7 @@ class RetrieveSongs:
         self.spotify_token = refresher.refresh()
         print("Getting songs...")
         self.get_songs()
+
 
 if __name__ == "__main__":
     tracks = RetrieveSongs()
