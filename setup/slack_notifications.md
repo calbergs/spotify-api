@@ -4,7 +4,7 @@
 - Go to api.slack.com/apps and click on "Create New App" then click on "From scratch"
 - Give your app a name and select your workspace where the alerts will be sent then click "Create App"
 - Enable incoming webhooks for your Slack workspace app
-- You can test your webhook from the command line by running the code below (replace with your own key):
+- You can test your webhook from the command-line by running the code below (replace with your own key):
   ```
   -curl -X POST -H 'Content-type: application/json' --data '{"text":"Hello, World!"}' https://hooks.slack.com/services/00000000000/00000000000/000000000000000000000000
   ```
