@@ -4,7 +4,7 @@ models:
   - name: dim_songs
     description: "Songs table"
     columns:
-      - name: played_at_cst
+      - name: played_at_ct
         description: "The primary key for this table"
         tests:
           - unique
