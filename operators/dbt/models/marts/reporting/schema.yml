@@ -4,7 +4,7 @@ models:
   - name: rpt_most_listened
     description: "Most listened artists and tracks"
     columns:
-      - name: (artist_name || song_link)
+      - name: (artist_name || song_name || song_link)
         description: "The primary key for this table"
         tests:
           - unique
