@@ -27,3 +27,12 @@ models:
         tests:
           - unique
           - not_null
+
+  - name: fct_listening_activity_trends
+    description: "Day-over-day and week-over-week change in total listening time (song_duration_mins)"
+    columns:
+      - name: (granularity || period_start_date)
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
