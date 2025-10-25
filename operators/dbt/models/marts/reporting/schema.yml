@@ -17,10 +17,10 @@ models:
         tests:
           - unique
           - not_null
-  - name: rpt_weekly_discovers
-    description: "New artists discovered in the current week"
+  - name: rpt_new_discovers
+    description: "New artists discovered in the current month or week"
     columns:
-      - name: artist_id
+      - name: (artist_id || current_week)
         description: "The primary key for this table"
         tests:
           - unique
@@ -29,6 +29,14 @@ models:
     description: "Hour of week heatmap on listening activity"
     columns:
       - name: (played_at_day_of_week || played_at_hour)
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
+  - name: rpt_listening_streaks
+    description: "Current listening streak"
+    columns:
+      - name: streak_group
         description: "The primary key for this table"
         tests:
           - unique
