@@ -61,7 +61,7 @@ Throughout this entire process if any Airflow task fails an automatic Slack aler
 ## Setup
 
 1. [Get Spotify API Access](https://github.com/calbergs/spotify-api/blob/master/setup/spotify_api_access.md)
-2. [Build Docker Containers for Airflow](https://github.com/calbergs/spotify-api/blob/master/setup/airflow_docker.md)
+2. Use the shared Airflow stack in the `data-platform` repo (see its `README.md` for `docker compose` instructions).
 3. [Set Up Airflow Connection to Postgres](https://github.com/calbergs/spotify-api/blob/master/setup/postgres.md)
 4. [Install dbt Core](https://github.com/calbergs/spotify-api/blob/master/setup/dbt.md)
 5. [Enable Airflow Slack Notifications](https://github.com/calbergs/spotify-api/blob/master/setup/slack_notifications.md)
