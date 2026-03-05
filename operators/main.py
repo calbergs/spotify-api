@@ -10,6 +10,7 @@ from secrets import spotify_user_id
 
 import pandas as pd
 import requests
+import psycopg2
 from postgres_connect import ConnectPostgres
 from refresh import RefreshToken
 from yaml_load import yaml_loader
@@ -27,9 +28,12 @@ class RetrieveSongs:
 
         query = "SELECT MAX(played_at_utc) FROM public.spotify_songs"
 
-        cur.execute(query)
-
-        max_played_at_utc = cur.fetchall()[0][0]
+        try:
+            cur.execute(query)
+            max_played_at_utc = cur.fetchall()[0][0]
+        except psycopg2.errors.UndefinedTable:
+            # Table does not exist, treat as no data
+            max_played_at_utc = None
 
         # If the spotify_songs table is empty, grab the earliest data we can. Set at t - 90 days for now.
         if max_played_at_utc is None:
