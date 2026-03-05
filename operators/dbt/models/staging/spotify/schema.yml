@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: spotify
     description: 'Spotify raw data landing zone'
-    database: spotify
+    database: "{{ target.database }}"
     schema: public
     tables:
       - name: spotify_songs
