@@ -1,6 +1,7 @@
 """
-Load config from environment or operators.secrets (for Postgres).
-Set SLACK_SIGNING_SECRET, SLACK_BOT_TOKEN, and ANTHROPIC_API_KEY in env or operators.secrets.
+Load config from environment or operators.app_secrets (for Postgres).
+Set SLACK_SIGNING_SECRET, SLACK_BOT_TOKEN, and ANTHROPIC_API_KEY in env or operators.app_secrets.
+(Uses app_secrets to avoid shadowing Python's built-in 'secrets' module, which breaks numpy/pandas.)
 """
 import os
 
@@ -10,7 +11,7 @@ def _get(name: str, default: str = "") -> str:
     if v:
         return v
     try:
-        from operators.secrets import __dict__ as s
+        from operators.app_secrets import __dict__ as s
         return str(s.get(name, default))
     except ImportError:
         return default
@@ -33,7 +34,7 @@ def get_pg_config():
             "dbname": os.environ.get("PG_DATABASE", "airflow"),
         }
     try:
-        from operators.secrets import host as pg_host, port as pg_port, pg_user, pg_password, dbname
+        from operators.app_secrets import host as pg_host, port as pg_port, pg_user, pg_password, dbname
         return {
             "host": pg_host,
             "port": int(pg_port) if isinstance(pg_port, str) else pg_port,

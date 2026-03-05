@@ -47,10 +47,10 @@ The bot needs:
 - **ANTHROPIC_API_KEY** – From [Anthropic Console](https://console.anthropic.com/).
 - **SLACK_BOT_TOKEN** – (Optional, for DMs/@mentions.) Bot User OAuth Token after Install App.
 - **Postgres** – Same as your Spotify pipeline. Either:
-  - Use `operators/secrets.py` (with `host`, `port`, `pg_user`, `pg_password`, `dbname`), or
+  - Use `operators/app_secrets.py` (with `host`, `port`, `pg_user`, `pg_password`, `dbname`), or
   - Set env: `SPOTIFY_PG_HOST`, `SPOTIFY_PG_PORT`, `PG_USER`, `PG_PASSWORD`, `PG_DATABASE` (default `airflow`).
 
-**Option A** – add to `operators/secrets.py` (gitignored):
+**Option A** – add to `operators/app_secrets.py` (gitignored):
 
 ```python
 SLACK_SIGNING_SECRET = "your_signing_secret_here"
@@ -100,7 +100,7 @@ You’ll get “Thinking…” then the answer when Claude and the DB respond.
 - [ ] Postgres has `spotify_songs` and `spotify_genres` (Airflow Spotify DAG).
 - [ ] Dependencies installed (`flask`, `anthropic`, `requests`, `psycopg2-binary`).
 - [ ] Slack app created; Slash Command `/spotify` with Request URL = `https://<your-public-host>/slack/spotify`.
-- [ ] Signing Secret and Anthropic API key set (in `operators/secrets.py` or env).
+- [ ] Signing Secret and Anthropic API key set (in `operators/app_secrets.py` or env).
 - [ ] App running and reachable (ngrok or production).
 - [ ] Test with `/spotify top artists this month`.
 
