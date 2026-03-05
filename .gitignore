@@ -1,5 +1,5 @@
 __pycache__/
-venv/
+.venv/
 steps.txt
 secrets.py
 .DS_Store
@@ -12,6 +12,7 @@ spotify.drawio
 **/extended_streaming_history/
 backfill_extended_streaming_history.py
 tests.ipynb
+operators/venv/
 
 # Airflow
 **/logs/*
