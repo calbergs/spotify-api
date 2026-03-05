@@ -13,6 +13,7 @@ spotify.drawio
 backfill_extended_streaming_history.py
 tests.ipynb
 operators/venv/
+operators/spotify_secrets.py
 
 # Airflow
 **/logs/*
