@@ -2,7 +2,7 @@
 Generates a new access token on each run
 """
 
-from secrets import base_64, refresh_token
+from spotify_secrets import base_64, refresh_token
 
 import requests
 

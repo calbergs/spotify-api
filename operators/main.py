@@ -6,7 +6,7 @@ import datetime as dt
 import os.path
 from datetime import datetime
 from pathlib import Path
-from secrets import spotify_user_id
+from spotify_secrets import spotify_user_id
 
 import pandas as pd
 import requests
