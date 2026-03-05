@@ -117,6 +117,7 @@ def backfill_csv_folder(base_folder, table_name):
                 copy_csv_to_postgres(table_name, full_path)
 
 if __name__ == "__main__":
-    # Path to your folder containing the CSV files
-    spotify_songs_folder = "/Users/albertcheng/Documents/GitHub/spotify/dags/spotify_data/spotify_songs"
+    # Path to folder containing the CSV files (repo root is parent of operators/)
+    _repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    spotify_songs_folder = os.path.join(_repo_root, "dags", "spotify_data", "spotify_songs")
     backfill_csv_folder(spotify_songs_folder, "spotify_songs")
