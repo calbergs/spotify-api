@@ -2,10 +2,10 @@ import os
 import psycopg2
 
 # Postgres connection info.
-# Defaults match the shared Airflow Postgres, but can be overridden via env vars
-# when running from the host (e.g. host=localhost).
+# Defaults: localhost (for running on host). When run inside Airflow/Docker, set
+# SPOTIFY_PG_HOST=host.docker.internal. If Postgres is on a non-default port (e.g. 5433), set SPOTIFY_PG_PORT.
 POSTGRES_CONFIG = {
-    "host": os.getenv("SPOTIFY_PG_HOST", "host.docker.internal"),
+    "host": os.getenv("SPOTIFY_PG_HOST", "localhost"),
     "port": int(os.getenv("SPOTIFY_PG_PORT", "5432")),
     "user": os.getenv("SPOTIFY_PG_USER", "airflow"),
     "password": os.getenv("SPOTIFY_PG_PASSWORD", "airflow"),

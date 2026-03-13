@@ -4,15 +4,16 @@ Makes requests to the Spotify API to retrieve recently played songs and the corr
 
 import datetime as dt
 import os.path
+import sys
 from datetime import datetime
 from pathlib import Path
-from spotify_secrets import spotify_user_id
 
 import pandas as pd
-import requests
 import psycopg2
+import requests
 from postgres_connect import ConnectPostgres
 from refresh import RefreshToken
+from spotify_secrets import spotify_user_id
 from yaml_load import yaml_loader
 
 
@@ -59,15 +60,29 @@ class RetrieveSongs:
         genres = config["files"]["genres"]
         genres_tmp = config["files"]["genres_tmp"]
 
-        # Download all songs listened to since the last run or since the earliest listen date defined in the get_latest_listened_timestamp function
+        # Download all songs listened to since the last run or since the earliest listen date
         song_response = requests.get(
             "https://api.spotify.com/v1/me/player/recently-played?limit=50&after={time}".format(
                 time=latest_timestamp
             ),
             headers=headers,
         )
-
-        song_data = song_response.json()
+        if song_response.status_code != 200:
+            print(
+                "ERROR: Spotify recently-played API returned "
+                f"{song_response.status_code}: {song_response.text[:200]}",
+                file=sys.stderr,
+            )
+            song_response.raise_for_status()
+        try:
+            song_data = song_response.json()
+        except ValueError:
+            print(
+                "ERROR: Failed to parse Spotify recently-played response as JSON. "
+                f"Status {song_response.status_code}, body starts with: {song_response.text[:200]}",
+                file=sys.stderr,
+            )
+            raise
 
         played_at_utc = []
         played_date_utc = []
@@ -147,7 +162,7 @@ class RetrieveSongs:
             # Check to see if file exists. If not create a new file, else append to existing file.
             if songs_file_exists:
                 curr_song_df = pd.read_csv(path_to_songs_file)
-                curr_song_df = curr_song_df.append(song_df)
+                curr_song_df = pd.concat([curr_song_df, song_df], ignore_index=True)
                 curr_song_df.to_csv(path_to_songs_file, index=False)
             else:
                 output_song_dir.mkdir(parents=True, exist_ok=True)
@@ -166,8 +181,22 @@ class RetrieveSongs:
             artist_response = requests.get(
                 "https://api.spotify.com/v1/artists/{id}".format(id=id), headers=headers
             )
-
-            artist_data = artist_response.json()
+            if artist_response.status_code != 200:
+                print(
+                    "ERROR: Spotify artist API returned "
+                    f"{artist_response.status_code} for id {id}: {artist_response.text[:200]}",
+                    file=sys.stderr,
+                )
+                artist_response.raise_for_status()
+            try:
+                artist_data = artist_response.json()
+            except ValueError:
+                print(
+                    "ERROR: Failed to parse Spotify artist response as JSON for id "
+                    f"{id}. Status {artist_response.status_code}, body starts with: {artist_response.text[:200]}",
+                    file=sys.stderr,
+                )
+                raise
 
             artist_ids_genres.append(artist_data["id"])
             artist_names.append(artist_data["name"])
@@ -191,7 +220,7 @@ class RetrieveSongs:
         artist_genre_df_nh = pd.read_csv(f"{genres_tmp}.csv", sep=",")
         try:
             curr_artist_genre_df = pd.read_csv(f"{genres}.csv", sep=",")
-            curr_artist_genre_df = curr_artist_genre_df.append(artist_genre_df_nh)
+            curr_artist_genre_df = pd.concat([curr_artist_genre_df, artist_genre_df_nh], ignore_index=True)
             curr_artist_genre_df.drop_duplicates(
                 subset="artist_id", keep="first", inplace=True
             )

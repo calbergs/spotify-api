@@ -35,7 +35,8 @@ pip install flask anthropic requests psycopg2-binary
    - Short description: `Ask questions about your Spotify listening history`
    - Usage hint: `Who are my top artists this month?`
 4. **Basic Information** → **App Credentials**: copy **Signing Secret**.
-5. **Install App** → Install to workspace. For **slash only** you don’t need a Bot token. For **DMs / @mentions**, copy the **Bot User OAuth Token** (`xoxb-...`).
+5. **OAuth & Permissions** → **Bot Token Scopes**: add **`chat:write`** if you use the **weekly summary** (Airflow posts to a channel) or DMs/@mentions. Without it, weekly summary fails with `missing_scope`, `needed: chat:write:bot`.
+6. **Install App** → Install to workspace (or **Reinstall to Workspace** after adding scopes). Copy the **Bot User OAuth Token** (`xoxb-...`) for weekly summary or DMs.
 
 ---
 
@@ -45,7 +46,7 @@ The bot needs:
 
 - **SLACK_SIGNING_SECRET** – From Slack app → Basic Information → App Credentials.
 - **ANTHROPIC_API_KEY** – From [Anthropic Console](https://console.anthropic.com/).
-- **SLACK_BOT_TOKEN** – (Optional, for DMs/@mentions.) Bot User OAuth Token after Install App.
+- **SLACK_BOT_TOKEN** – Required for the **weekly summary** (Airflow → Slack channel) and optional for DMs/@mentions. Bot User OAuth Token; the app must have **chat:write** scope.
 - **Postgres** – Same as your Spotify pipeline. Either:
   - Use `operators/app_secrets.py` (with `host`, `port`, `pg_user`, `pg_password`, `dbname`), or
   - Set env: `SPOTIFY_PG_HOST`, `SPOTIFY_PG_PORT`, `PG_USER`, `PG_PASSWORD`, `PG_DATABASE` (default `airflow`).
@@ -95,11 +96,21 @@ You’ll get “Thinking…” then the answer when Claude and the DB respond.
 
 ---
 
+## Weekly summary (Airflow)
+
+The DAG task `weekly_summary_to_slack` runs on Monday and posts a summary to Slack (e.g. `#general`). It uses **SLACK_BOT_TOKEN** and the Slack API `chat.postMessage`. You need:
+
+1. **Bot scope `chat:write`** (OAuth & Permissions → Bot Token Scopes). Add it, then **Reinstall to Workspace** and set the Bot User OAuth Token where the DAG runs.
+2. **Bot in the channel** – The bot must be a member of the target channel. In Slack, go to the channel (e.g. `#general`) and run **`/invite @YourSpotifyAppName`** (or add the app via channel settings). Otherwise you get `"error":"not_in_channel"`.
+
+---
+
 ## Summary checklist
 
 - [ ] Postgres has `spotify_songs` and `spotify_genres` (Airflow Spotify DAG).
 - [ ] Dependencies installed (`flask`, `anthropic`, `requests`, `psycopg2-binary`).
 - [ ] Slack app created; Slash Command `/spotify` with Request URL = `https://<your-public-host>/slack/spotify`.
+- [ ] For **weekly summary**: Bot scope **`chat:write`** added and app reinstalled; **SLACK_BOT_TOKEN** set where Airflow runs.
 - [ ] Signing Secret and Anthropic API key set (in `operators/app_secrets.py` or env).
 - [ ] App running and reachable (ngrok or production).
 - [ ] Test with `/spotify top artists this month`.

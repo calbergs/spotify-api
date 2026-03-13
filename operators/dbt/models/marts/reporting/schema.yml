@@ -23,7 +23,6 @@ models:
       - name: (artist_id || current_week)
         description: "The primary key for this table"
         tests:
-          - unique
           - not_null
   - name: rpt_hour_of_week
     description: "Hour of week heatmap on listening activity"

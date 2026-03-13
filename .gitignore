@@ -27,3 +27,5 @@ test_dag.py
 **logs/
 **.log
 **profiles.yml
+# Allow committed profile that uses env vars only (no secrets)
+!operators/dbt/profiles.yml

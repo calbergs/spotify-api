@@ -1,0 +1,15 @@
+# dbt profile for Spotify project. Uses env vars so the same Postgres as Airflow
+# is used when run in Docker (set POSTGRES_HOST_PORT in data-platform/.env if port is not 5432).
+postgres:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('SPOTIFY_PG_HOST', 'host.docker.internal') }}"
+      # Quoted so YAML parses; value renders as string—some dbt versions accept it.
+      port: "{{ env_var('POSTGRES_HOST_PORT', '5432') | int }}"
+      user: "{{ env_var('SPOTIFY_PG_USER', 'airflow') }}"
+      password: "{{ env_var('SPOTIFY_PG_PASSWORD', 'airflow') }}"
+      dbname: "{{ env_var('SPOTIFY_PG_DB', 'airflow') }}"
+      schema: public
+      threads: 4

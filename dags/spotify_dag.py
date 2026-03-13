@@ -5,39 +5,45 @@ from datetime import datetime, timedelta
 
 import copy_to_postgres
 from airflow import DAG
-from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
-from airflow.hooks.base_hook import BaseHook
+from airflow.models import Variable
 from airflow.operators.bash import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators.python import PythonOperator
+from airflow.operators.python import PythonOperator, ShortCircuitOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow_dbt.operators.dbt_operator import DbtRunOperator, DbtTestOperator
 
+try:
+    from airflow.providers.slack.hooks.slack_webhook import SlackWebhookHook
+    SLACK_AVAILABLE = True
+except ImportError:
+    SLACK_AVAILABLE = False
+
 
 def task_fail_slack_alert(context):
-    slack_webhook_token = BaseHook.get_connection("slack").password
-    slack_msg = """
-        :x: Task Failed
-        *Task*: {task}
-        *Dag*: {dag}
-        *Execution Time*: {exec_date}
-        *Log URL*: {log_url}
-        """.format(
-        task=context.get("task_instance").task_id,
-        dag=context.get("task_instance").dag_id,
-        ti=context.get("task_instance"),
-        exec_date=context.get("execution_date"),
-        log_url=context.get("task_instance").log_url,
+    """Send Slack alert when a task fails. Uses Airflow connection id 'slack' (slackwebhook, Password = webhook URL)."""
+    if not SLACK_AVAILABLE:
+        return None
+    ti = context.get("task_instance")
+    exec_date = context.get("logical_date") or context.get("execution_date")
+    slack_msg = (
+        ":x: Task Failed\n"
+        "*Task*: {task}\n"
+        "*Dag*: {dag}\n"
+        "*Execution Time*: {exec_date}\n"
+        "*Log URL*: {log_url}"
+    ).format(
+        task=ti.task_id,
+        dag=ti.dag_id,
+        exec_date=exec_date,
+        log_url=ti.log_url,
     )
-    failed_alert = SlackWebhookOperator(
-        task_id="slack_alert",
-        http_conn_id="slack",
-        webhook_token=slack_webhook_token,
-        message=slack_msg,
-        username="airflow",
-        dag=dag,
-    )
-    return failed_alert.execute(context=context)
+    try:
+        hook = SlackWebhookHook(slack_webhook_conn_id="slack")
+        hook.send(text=slack_msg)
+    except Exception as e:
+        # Log only; don't raise or the failure callback itself fails and you get no alert
+        print(f"Slack alert failed: {e}")
+    return None
 
 
 args = {
@@ -49,6 +55,30 @@ args = {
     "on_success_callback": None,
     "on_failure_callback": task_fail_slack_alert,
 }
+
+
+def should_send_spotify_weekly_summary(**context):
+    """Only send the weekly Spotify summary on Monday at 9am Central Time."""
+    dag_run = context.get("dag_run")
+    run_type = str(getattr(dag_run, "run_type", "")).lower() if dag_run else ""
+    # For manual/backfill runs, always send (ignore the scheduled data interval)
+    if run_type and run_type != "scheduled":
+        return True
+    # For scheduled runs, base the gate on the **end** of the data interval
+    dt = context.get("data_interval_end") or context.get("logical_date") or context.get("execution_date")
+    if not dt:
+        return False
+    try:
+        import pendulum
+        central = pendulum.timezone("America/Chicago")
+        if hasattr(dt, "in_timezone"):
+            ct = dt.in_timezone(central)
+        else:
+            ct = pendulum.instance(dt).in_timezone(central)
+        return ct.weekday() == 0 and ct.hour == 9
+    except Exception:
+        return False
+
 
 with DAG(
     dag_id="spotify_dag",
@@ -98,6 +128,29 @@ with DAG(
         profiles_dir="/opt/airflow/operators/dbt/",
     )
 
+    postgres_port = Variable.get("POSTGRES_HOST_PORT", default_var="5433")
+
+    check_weekly_summary = ShortCircuitOperator(
+        task_id="check_weekly_summary_window",
+        python_callable=should_send_spotify_weekly_summary,
+    )
+
+    spotify_slack_channel = Variable.get("SPOTIFY_SLACK_CHANNEL", default_var="#general")
+
+    weekly_summary = BashOperator(
+        task_id="weekly_summary_to_slack",
+        bash_command="cd /opt/spotify && python -m slack_bot.weekly_summary",
+        env={
+            "PYTHONPATH": "/opt/spotify",
+            "SPOTIFY_PG_HOST": "host.docker.internal",
+            "SPOTIFY_PG_PORT": postgres_port,
+            "PG_USER": "airflow",
+            "PG_PASSWORD": "airflow",
+            "PG_DATABASE": "airflow",
+            "SPOTIFY_SLACK_CHANNEL": spotify_slack_channel,
+        },
+    )
+
     continue_task = DummyOperator(task_id="continue")
 
     start_task = DummyOperator(task_id="start")
@@ -112,5 +165,7 @@ with DAG(
         >> list(load_tables.values())
         >> dbt_run
         >> dbt_test
+        >> check_weekly_summary
+        >> weekly_summary
         >> end_task
     )
