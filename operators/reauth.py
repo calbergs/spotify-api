@@ -18,7 +18,7 @@ import requests
 
 from spotify_secrets import base_64
 
-SCOPE = "user-read-recently-played"
+SCOPE = "user-read-recently-played user-library-read"
 SECRETS_FILE = "spotify_secrets.py"  # run from operators/
 
 

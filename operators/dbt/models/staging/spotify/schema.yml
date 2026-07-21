@@ -10,3 +10,5 @@ sources:
         description: 'Details about the songs the user listened to'
       - name: spotify_genres
         description: 'Details about the corresponding genres of the songs the user listened to'
+      - name: spotify_saved_tracks
+        description: 'Tracks currently in the user''s Liked Songs library, full-refreshed each run'

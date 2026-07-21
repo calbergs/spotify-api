@@ -233,12 +233,95 @@ class RetrieveSongs:
             artist_genre_df_nh.to_csv(f"{genres}.csv", index=False)
         os.remove(f"{genres_tmp}.csv")
 
+    # Extract the user's saved ("liked") tracks from Spotify API.
+    # No incremental cursor exists for this endpoint (unlike recently-played),
+    # so this always does a full paginated fetch; the loader does a full
+    # table refresh to match (see create_spotify_saved_tracks.sql), which
+    # also correctly drops tracks the user has since unliked.
+    #
+    # Requires the `user-library-read` scope, added after this endpoint was
+    # introduced — an existing refresh token won't have it until re-auth
+    # (see reauth.py). Until then this writes an empty (header-only) CSV
+    # instead of raising, so the rest of the pipeline (songs, genres, dbt)
+    # keeps working unaffected.
+    SAVED_TRACKS_COLUMNS = ["track_id", "song_name", "artist_name", "album_name", "added_at_utc"]
+
+    def get_saved_tracks(self):
+        headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": "Bearer {}".format(self.spotify_token),
+        }
+        config = yaml_loader()
+        saved_tracks = config["files"]["saved_tracks"]
+
+        track_ids = []
+        song_names = []
+        artist_names = []
+        album_names = []
+        added_at_utc = []
+
+        url = "https://api.spotify.com/v1/me/tracks?limit=50"
+        while url:
+            response = requests.get(url, headers=headers)
+            if response.status_code == 403:
+                print(
+                    "WARNING: Spotify saved-tracks API returned 403 (missing "
+                    "user-library-read scope). Run operators/reauth.py to "
+                    "re-authorize with the expanded scope. Skipping saved-tracks "
+                    "sync for this run.",
+                    file=sys.stderr,
+                )
+                pd.DataFrame(columns=self.SAVED_TRACKS_COLUMNS + ["last_updated_datetime_utc"]).to_csv(
+                    f"{saved_tracks}.csv", index=False
+                )
+                return
+            if response.status_code != 200:
+                print(
+                    "ERROR: Spotify saved-tracks API returned "
+                    f"{response.status_code}: {response.text[:200]}",
+                    file=sys.stderr,
+                )
+                response.raise_for_status()
+            try:
+                data = response.json()
+            except ValueError:
+                print(
+                    "ERROR: Failed to parse Spotify saved-tracks response as JSON. "
+                    f"Status {response.status_code}, body starts with: {response.text[:200]}",
+                    file=sys.stderr,
+                )
+                raise
+
+            for item in data["items"]:
+                track = item["track"]
+                track_ids.append(track["id"])
+                song_names.append(track["name"])
+                artist_names.append(track["artists"][0]["name"])
+                album_names.append(track["album"]["name"])
+                added_at_utc.append(item["added_at"])
+
+            url = data.get("next")
+
+        saved_dict = {
+            "track_id": track_ids,
+            "song_name": song_names,
+            "artist_name": artist_names,
+            "album_name": album_names,
+            "added_at_utc": added_at_utc,
+        }
+        saved_df = pd.DataFrame(saved_dict, columns=self.SAVED_TRACKS_COLUMNS)
+        saved_df["last_updated_datetime_utc"] = dt.datetime.utcnow()
+        saved_df.to_csv(f"{saved_tracks}.csv", index=False)
+
     def call_refresh(self):
         print("Refreshing token...")
         refresher = RefreshToken()
         self.spotify_token = refresher.refresh()
         print("Getting songs...")
         self.get_songs()
+        print("Getting saved tracks...")
+        self.get_saved_tracks()
 
 
 if __name__ == "__main__":

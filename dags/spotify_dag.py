@@ -85,6 +85,7 @@ with DAG(
     TASK_DEFS = {
         "songs": {"path": "sql/create_spotify_songs.sql"},
         "genres": {"path": "sql/create_spotify_genres.sql"},
+        "saved_tracks": {"path": "sql/create_spotify_saved_tracks.sql"},
     }
 
     create_tables_if_not_exists = {
