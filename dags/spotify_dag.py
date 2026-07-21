@@ -99,6 +99,10 @@ with DAG(
     extract_spotify_data = BashOperator(
         task_id="extract_spotify_data",
         bash_command="python3 /opt/airflow/operators/main.py",
+        # A failed refresh token is dead on the first attempt (invalid_grant) —
+        # retrying with the same token just repeats the same failure. Don't
+        # blind-retry; fail fast and alert so someone re-authorizes.
+        retries=0,
     )
 
     load_tables = {
@@ -130,6 +134,7 @@ with DAG(
     )
 
     spotify_slack_channel = Variable.get("SPOTIFY_SLACK_CHANNEL", default_var="#general")
+    spotify_slack_bot_token = Variable.get("SPOTIFY_SLACK_BOT_TOKEN", default_var="")
 
     weekly_summary = BashOperator(
         task_id="weekly_summary_to_slack",
@@ -142,6 +147,8 @@ with DAG(
             "PG_PASSWORD": "airflow",
             "PG_DATABASE": "airflow",
             "SPOTIFY_SLACK_CHANNEL": spotify_slack_channel,
+            "SLACK_BOT_TOKEN": spotify_slack_bot_token,
+            "ANTHROPIC_API_KEY": Variable.get("ANTHROPIC_API_KEY", default_var=""),
         },
     )
 

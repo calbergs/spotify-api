@@ -21,11 +21,26 @@ class RefreshToken:
             headers={"Authorization": "Basic " + self.base_64},
         )
         if response.status_code != 200:
-            print(
-                "ERROR: Spotify token refresh failed with "
-                f"{response.status_code}: {response.text[:200]}",
-                file=sys.stderr,
-            )
+            try:
+                err = response.json()
+            except ValueError:
+                err = {}
+            if err.get("error") == "invalid_grant":
+                print(
+                    "ERROR: Spotify refresh token is invalid/expired/revoked "
+                    f"({err.get('error_description', 'no description')}). "
+                    "Spotify refresh tokens now expire after 6 months of "
+                    "inactivity (policy change effective July 2026) — retrying "
+                    "will not help. Run `python3 operators/reauth.py` to "
+                    "re-authorize and get a new refresh token.",
+                    file=sys.stderr,
+                )
+            else:
+                print(
+                    "ERROR: Spotify token refresh failed with "
+                    f"{response.status_code}: {response.text[:200]}",
+                    file=sys.stderr,
+                )
             response.raise_for_status()
         try:
             response_json = response.json()
