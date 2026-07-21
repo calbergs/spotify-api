@@ -10,6 +10,7 @@ Walks through the OAuth authorization-code flow interactively and writes
 the new access_token/refresh_token back into spotify_secrets.py.
 """
 import base64
+import os
 import re
 import sys
 from urllib.parse import urlencode, urlparse, parse_qs
@@ -19,7 +20,11 @@ import requests
 from spotify_secrets import base_64
 
 SCOPE = "user-read-recently-played user-library-read"
-SECRETS_FILE = "spotify_secrets.py"  # run from operators/
+# Absolute path (next to this script) so it works regardless of the caller's
+# cwd — `import spotify_secrets` above already succeeds cwd-independently
+# since Python adds the script's own directory to sys.path, but a bare
+# open("spotify_secrets.py") does not get that same treatment.
+SECRETS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "spotify_secrets.py")
 
 
 def client_id_from_base64(b64: str) -> str:
