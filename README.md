@@ -58,6 +58,20 @@ Throughout this entire process if any Airflow task fails an automatic Slack aler
 <img width="1472" alt="image" src="https://raw.githubusercontent.com/calbergs/spotify-api/refs/heads/master/images/superset_heatmap.png">
 
 
+## Slack Bot
+
+Beyond the scheduled weekly summary, there's an on-demand `/spotify` Slack slash command that lets you ask Claude questions about your listening history in plain English — it queries the `spotify_songs`/`spotify_genres` Postgres tables via Claude tool-calling and answers directly in Slack:
+
+```
+/spotify Who are my top artists this month?
+/spotify What genres did I listen to last week?
+/spotify Recent listens
+```
+
+You'll see an immediate "Thinking…" reply, then the real answer once Claude and the DB respond. You can also DM the bot or @mention it in a channel for multi-turn follow-up questions (e.g. ask a question, then "what about last year?") — it keeps the last 20 messages of context per conversation.
+
+Full setup (Slack app, Slash Command, ngrok/ngrok-proxy wiring, optional DM/@mention support) is in [`slack_bot/README.md`](slack_bot/README.md).
+
 ## Setup
 
 Current setup (everything runs inside the shared `data-platform` Airflow/Postgres stack):
