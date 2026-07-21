@@ -1,3 +1,5 @@
+> **Outdated:** this describes the original standalone setup (local Postgres on the default port, database `spotify`). The project now runs inside the shared `data-platform` Airflow stack (see that repo's `.env` for the actual host/port/database) — see `data-platform/README.md`. Kept for historical reference only.
+
 # Set up Airflow connection to Postgres
 
 - Add ports to the section under services and Postgres in the docker-compose.yaml file like below:

@@ -60,12 +60,16 @@ Throughout this entire process if any Airflow task fails an automatic Slack aler
 
 ## Setup
 
-1. [Get Spotify API Access](https://github.com/calbergs/spotify-api/blob/master/setup/spotify_api_access.md)
-2. Use the shared Airflow stack in the `data-platform` repo (see its `README.md` for `docker compose` instructions).
-3. [Set Up Airflow Connection to Postgres](https://github.com/calbergs/spotify-api/blob/master/setup/postgres.md)
-4. [Install dbt Core](https://github.com/calbergs/spotify-api/blob/master/setup/dbt.md)
-5. [Enable Airflow Slack Notifications](https://github.com/calbergs/spotify-api/blob/master/setup/slack_notifications.md)
-6. [Install Metabase](https://github.com/calbergs/spotify-api/blob/master/setup/metabase.md)
+Current setup (everything runs inside the shared `data-platform` Airflow/Postgres stack):
+
+1. [Get Spotify API Access](https://github.com/calbergs/spotify-api/blob/master/setup/spotify_api_access.md) — includes what to do when your refresh token expires (Spotify tokens now expire after 6 months of inactivity; see `operators/reauth.py`).
+2. Use the shared Airflow stack in the `data-platform` repo (see its `README.md` for `docker compose` instructions). This provisions Postgres, runs the DAG (which handles `dbt build` internally — no standalone dbt install needed), and starts Superset.
+3. [Enable Airflow Slack Notifications](https://github.com/calbergs/spotify-api/blob/master/setup/slack_notifications.md) for task-failure alerts.
+4. (Optional) [`/spotify` Slack bot](slack_bot/README.md) — ask questions about your listening history on demand, separate from the scheduled weekly summary.
+
+Dashboarding is via **Apache Superset**, shared with the `ynab-api` Superset instance (both read from the same `airflow` Postgres database — see `ynab-api/README.md`'s Superset section). Metabase is no longer used.
+
+`setup/postgres.md`, `setup/dbt.md`, and `setup/metabase.md` describe an older, standalone setup (before this moved into the shared `data-platform` stack) and are kept only for historical reference — don't follow them for a fresh setup.
 
 ## Further Improvements (Work In Progress)
 

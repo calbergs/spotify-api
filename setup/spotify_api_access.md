@@ -33,5 +33,22 @@
     - Using the format above convert to a base 64 encoded string by going to [base64encode.org](https://www.base64encode.org/), pasting in the string, and then clicking encode. Ensure encode is selected and not decode.<br>
     - This will be defined as base_64 in our code and will be used when we generate a new access token on each run<br>
 
+## Refresh Token Expiry & Re-Authorization
+
+As of July 20, 2026, Spotify refresh tokens expire after **6 months of inactivity** (or per Spotify's rotation policy — see their Developer Blog, June 18, 2026). When your refresh token expires or is revoked, `refresh.py` will fail with `invalid_grant` ("Refresh token revoked") instead of silently working.
+
+**Do not just retry** — a dead refresh token stays dead. Instead:
+
+1. `refresh.py` will print a message telling you to re-authorize.
+2. Run the re-authorization script from the `operators/` directory:
+   ```bash
+   cd operators
+   python3 reauth.py
+   ```
+3. It prompts for your app's registered Redirect URI, prints a Spotify authorize URL to open in a browser, and asks you to paste back the redirected URL (the page failing to load afterward is expected — the `code=` param is still in the address bar).
+4. It writes the new `access_token`/`refresh_token` directly into `spotify_secrets.py`.
+
+The Airflow DAG's `extract_spotify_data` task has `retries=0` specifically because retrying with an already-revoked token can't succeed — see `dags/spotify_dag.py`.
+
 References:
 https://developer.spotify.com/console/get-recently-played/?limit=&after=&before=

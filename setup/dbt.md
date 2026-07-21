@@ -1,3 +1,5 @@
+> **Outdated:** this describes installing dbt standalone on your machine. The project now runs `dbt build` inside the `data-platform` Airflow worker container (dbt is already installed there) via the `spotify_dag` DAG — no separate dbt install needed. Kept for historical reference only.
+
 # Install dbt Core with Homebrew (or your method of choice)
 
 - Run the below commands:
