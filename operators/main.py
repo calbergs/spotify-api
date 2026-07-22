@@ -311,6 +311,12 @@ class RetrieveSongs:
             "added_at_utc": added_at_utc,
         }
         saved_df = pd.DataFrame(saved_dict, columns=self.SAVED_TRACKS_COLUMNS)
+        # Spotify's saved-tracks pagination has no stable cursor, so a like/unlike
+        # or reorder happening mid-fetch can shift items across pages and cause
+        # the same track to come back on two different pages. The loader does a
+        # raw COPY into a table with track_id as primary key, so any duplicate
+        # here fails the whole load -- drop them before writing.
+        saved_df = saved_df.drop_duplicates(subset="track_id", keep="last")
         saved_df["last_updated_datetime_utc"] = dt.datetime.utcnow()
         saved_df.to_csv(f"{saved_tracks}.csv", index=False)
 
