@@ -5,6 +5,7 @@ Makes requests to the Spotify API to retrieve recently played songs and the corr
 import datetime as dt
 import os.path
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -15,6 +16,48 @@ from postgres_connect import ConnectPostgres
 from refresh import RefreshToken
 from spotify_secrets import spotify_user_id
 from yaml_load import yaml_loader
+
+
+def request_with_retry(url, headers, max_retries=3, backoff_seconds=2, timeout=30):
+    """GET with exponential-backoff retries for transient failures (5xx
+    responses, connection errors, timeouts) -- e.g. the 503 Spotify's API
+    occasionally returns mid-pagination on the saved-tracks endpoint.
+
+    4xx responses (401/403 auth failures) are returned immediately without
+    retrying: a bad/expired token or missing scope fails identically on every
+    attempt, so retrying just delays the caller's existing fail-fast error
+    handling for no benefit -- same reasoning as extract_spotify_data's
+    retries=0 in the DAG.
+    """
+    attempt = 0
+    while True:
+        try:
+            response = requests.get(url, headers=headers, timeout=timeout)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+            attempt += 1
+            if attempt > max_retries:
+                raise
+            wait = backoff_seconds * (2 ** (attempt - 1))
+            print(
+                f"WARNING: {e.__class__.__name__} on {url}, retrying in {wait}s "
+                f"(attempt {attempt}/{max_retries})...",
+                file=sys.stderr,
+            )
+            time.sleep(wait)
+            continue
+
+        if response.status_code >= 500 and attempt < max_retries:
+            attempt += 1
+            wait = backoff_seconds * (2 ** (attempt - 1))
+            print(
+                f"WARNING: {url} returned {response.status_code}, retrying in {wait}s "
+                f"(attempt {attempt}/{max_retries})...",
+                file=sys.stderr,
+            )
+            time.sleep(wait)
+            continue
+
+        return response
 
 
 class RetrieveSongs:
@@ -61,7 +104,7 @@ class RetrieveSongs:
         genres_tmp = config["files"]["genres_tmp"]
 
         # Download all songs listened to since the last run or since the earliest listen date
-        song_response = requests.get(
+        song_response = request_with_retry(
             "https://api.spotify.com/v1/me/player/recently-played?limit=50&after={time}".format(
                 time=latest_timestamp
             ),
@@ -178,7 +221,7 @@ class RetrieveSongs:
         artist_ids_dedup = set(artist_ids)
 
         for id in artist_ids_dedup:
-            artist_response = requests.get(
+            artist_response = request_with_retry(
                 "https://api.spotify.com/v1/artists/{id}".format(id=id), headers=headers
             )
             if artist_response.status_code != 200:
@@ -263,7 +306,7 @@ class RetrieveSongs:
 
         url = "https://api.spotify.com/v1/me/tracks?limit=50"
         while url:
-            response = requests.get(url, headers=headers)
+            response = request_with_retry(url, headers=headers)
             if response.status_code == 403:
                 print(
                     "WARNING: Spotify saved-tracks API returned 403 (missing "
