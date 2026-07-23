@@ -82,8 +82,17 @@ with DAG(
     default_args=args,
 ) as dag:
 
+    # spotify_songs.source (added for lastfm-api's historical backfill into
+    # this same table) isn't in main.py's CSV, so that load needs an explicit
+    # column list -- see copy_to_postgres.copy_expert_csv.
+    SPOTIFY_SONGS_CSV_COLUMNS = [
+        "played_at_utc", "played_date_utc", "song_name", "artist_name",
+        "song_duration_ms", "song_link", "album_art_link", "album_name",
+        "album_id", "artist_id", "track_id", "last_updated_datetime_utc",
+    ]
+
     TASK_DEFS = {
-        "songs": {"path": "sql/create_spotify_songs.sql"},
+        "songs": {"path": "sql/create_spotify_songs.sql", "columns": SPOTIFY_SONGS_CSV_COLUMNS},
         "genres": {"path": "sql/create_spotify_genres.sql"},
         "saved_tracks": {"path": "sql/create_spotify_saved_tracks.sql"},
     }
@@ -110,7 +119,7 @@ with DAG(
         k: PythonOperator(
             task_id=f"load_{k}",
             python_callable=copy_to_postgres.copy_expert_csv,
-            op_kwargs={"file": f"spotify_{k}"},
+            op_kwargs={"file": f"spotify_{k}", "columns": v.get("columns")},
         )
         for k, v in TASK_DEFS.items()
     }

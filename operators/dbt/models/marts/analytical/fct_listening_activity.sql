@@ -38,7 +38,8 @@ final as (
 		songs.album_id,
 		songs.artist_id,
 		songs.track_id,
-		songs.last_updated_datetime_ct as last_updated_datetime
+		songs.last_updated_datetime_ct as last_updated_datetime,
+		songs.source
 
 	from songs
 

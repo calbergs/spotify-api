@@ -11,5 +11,6 @@ create table if not exists spotify_songs (
     artist_id text,
     track_id text,
     last_updated_datetime_utc timestamp,
+    source text not null default 'spotify',
     primary key (played_at_utc)
 );

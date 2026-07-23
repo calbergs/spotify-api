@@ -18,7 +18,8 @@ with songs as (
 		album_id,
 		artist_id,
 		track_id,
-		last_updated_datetime_utc at time zone 'utc' at time zone 'America/Chicago' as last_updated_datetime_ct
+		last_updated_datetime_utc at time zone 'utc' at time zone 'America/Chicago' as last_updated_datetime_ct,
+		source
 
 	from {{ ref('stg_songs') }}
 
