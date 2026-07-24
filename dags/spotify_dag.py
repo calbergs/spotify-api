@@ -4,11 +4,12 @@ sys.path.append("/opt/airflow/operators")
 from datetime import datetime, timedelta
 
 import copy_to_postgres
+from dag_helpers import is_weekly_summary_window, songs_csv_has_new_rows
 from airflow import DAG
 from airflow.models import Variable
 from airflow.operators.bash import BashOperator
 from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators.python import PythonOperator, ShortCircuitOperator
+from airflow.operators.python import BranchPythonOperator, PythonOperator, ShortCircuitOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow_dbt.operators.dbt_operator import DbtRunOperator, DbtTestOperator
 
@@ -57,6 +58,27 @@ args = {
 }
 
 
+CREATE_TABLE_TASK_IDS = [
+    "create_if_not_exists_spotify_songs_table",
+    "create_if_not_exists_spotify_genres_table",
+    "create_if_not_exists_spotify_saved_tracks_table",
+]
+
+
+def branch_on_payload(**context):
+    """Skips straight to `end` when this run's Spotify fetch had no new
+    plays at all -- there's nothing for table creation, loads, dbt, or the
+    weekly summary to do, and running dbt against an unchanged warehouse
+    every idle hour (this DAG runs hourly, 0-6 and 14-23 CT) is wasted
+    work. genres are derived from this same run's songs (see
+    RetrieveSongs.get_songs), so they're equally a no-op when songs is
+    empty; saved_tracks could in principle have new likes/unlikes on an
+    otherwise-quiet listening day, but those would just pick up on the
+    next non-empty run instead -- a minor, acceptable staleness trade-off
+    against running the whole pipeline every idle hour."""
+    return CREATE_TABLE_TASK_IDS if songs_csv_has_new_rows() else "end"
+
+
 def should_send_spotify_weekly_summary(**context):
     """Only send the weekly Spotify summary on Monday at 9am Central Time (scheduled or manual)."""
     dt = context.get("data_interval_end") or context.get("logical_date") or context.get("execution_date")
@@ -69,7 +91,7 @@ def should_send_spotify_weekly_summary(**context):
             ct = dt.in_timezone(central)
         else:
             ct = pendulum.instance(dt).in_timezone(central)
-        return ct.weekday() == 0 and ct.hour == 9
+        return is_weekly_summary_window(ct)
     except Exception:
         return False
 
@@ -157,11 +179,23 @@ with DAG(
 
     start_task = DummyOperator(task_id="start")
 
-    end_task = DummyOperator(task_id="end")
+    # trigger_rule matters here: `end` has two upstream paths (this branch
+    # directly, when the payload was empty, and the normal chain otherwise).
+    # The default "all_success" would leave `end` stuck as skipped whenever
+    # the branch takes the short path, since its OTHER upstream
+    # (weekly_summary) never runs -- none_failed_min_one_success reports
+    # `end` as a clean success as long as nothing actually failed.
+    end_task = DummyOperator(task_id="end", trigger_rule="none_failed_min_one_success")
 
+    check_payload_not_empty = BranchPythonOperator(
+        task_id="check_payload_not_empty",
+        python_callable=branch_on_payload,
+    )
+
+    start_task >> extract_spotify_data >> check_payload_not_empty
+    check_payload_not_empty >> end_task
     (
-        start_task
-        >> extract_spotify_data
+        check_payload_not_empty
         >> list(create_tables_if_not_exists.values())
         >> continue_task
         >> list(load_tables.values())

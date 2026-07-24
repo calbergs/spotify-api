@@ -85,11 +85,21 @@ Dashboarding is via **Apache Superset**, shared with the `ynab-api` Superset ins
 
 `setup/postgres.md`, `setup/dbt.md`, and `setup/metabase.md` describe an older, standalone setup (before this moved into the shared `data-platform` stack) and are kept only for historical reference — don't follow them for a fresh setup.
 
-## Further Improvements (Work In Progress)
+## Testing
 
-- Create a BranchPythonOperator to first check if the API payload is empty. If empty then proceed directly to the end task else continue to the downstream tasks.
-- Implement data quality checks to catch any potential errors in the dataset
-- Create unit tests to ensure pipeline is running as intended
-- Include CI/CD
-- Create more visualizations to uncover further insights once Spotify sends back my entire songs listening history from 10+ years back to the current date (this needed to be requested separately since the current API only allows requesting the 50 most recently played tracks)
-- If and whenever Spotify allows requesting historical data implement backfill capability
+Unit tests cover the pure logic behind the DAG's retry/branching behavior
+(`operators/main.py`'s `request_with_retry`, `operators/dag_helpers.py`'s
+payload-emptiness check and weekly-summary-window check) -- split into a
+plain module specifically so they're runnable without an Airflow install,
+unlike the DAG file itself.
+
+```bash
+pip install -r requirements.txt
+pytest
+```
+
+Data quality (beyond the primary-key `unique`/`not_null` tests every dbt
+model already has) is checked by `dbt test`: `not_null` on `song_name`/
+`artist_name`/`song_duration_mins`, plus two singular tests
+(`operators/dbt/tests/`) asserting no non-positive song durations and no
+listens timestamped in the future.

@@ -1,11 +1,11 @@
 __pycache__/
+.pytest_cache/
 .venv/
 steps.txt
 secrets.py
 .DS_Store
 **/*.env
 dev_script.py
-test*
 .user.yml
 references.md
 spotify.drawio

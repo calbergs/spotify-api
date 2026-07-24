@@ -9,6 +9,14 @@ models:
         tests:
           - unique
           - not_null
+      - name: song_name
+        description: "Data quality: a listen with no song name indicates a malformed extraction, not a real play"
+        tests:
+          - not_null
+      - name: artist_name
+        description: "Data quality: a listen with no artist name indicates a malformed extraction, not a real play"
+        tests:
+          - not_null
 
   - name: dim_genres
     description: "Genres table"
@@ -27,6 +35,26 @@ models:
         tests:
           - unique
           - not_null
+      - name: song_name
+        description: "Data quality: a listen with no song name indicates a malformed extraction, not a real play"
+        tests:
+          - not_null
+      - name: artist_name
+        description: "Data quality: a listen with no artist name indicates a malformed extraction, not a real play"
+        tests:
+          - not_null
+      - name: song_duration_mins
+        description: >
+          Data quality: every native Spotify play has a duration. Scoped to
+          source = 'spotify' -- lastfm-api's historical backfill legitimately
+          has ~600 rows with no duration (no Spotify match was ever found for
+          that track), which is expected missing data, not a pipeline defect.
+          See the assert_positive_song_duration singular test for the actual
+          >0 check (not_null alone doesn't catch a bad zero/negative value).
+        tests:
+          - not_null:
+              config:
+                where: "source = 'spotify'"
 
   - name: fct_listening_activity_trends
     description: "Day-over-day and week-over-week change in total listening time (song_duration_mins)"
