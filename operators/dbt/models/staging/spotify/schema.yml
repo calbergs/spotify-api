@@ -12,3 +12,12 @@ sources:
         description: 'Details about the corresponding genres of the songs the user listened to'
       - name: spotify_saved_tracks
         description: 'Tracks currently in the user''s Liked Songs library, full-refreshed each run'
+      - name: spotify_excluded_plays
+        description: >
+          Plays manually flagged as not worth counting (e.g. overnight
+          autoplay). Kept out of stg_songs and everything downstream, but
+          deliberately NOT deleted from spotify_songs itself -- the sync
+          cursor in operators/main.py is derived from MAX(played_at_utc) in
+          that table, so removing a row there rewinds the cursor and makes
+          the next sync re-fetch (and re-insert) that exact play from
+          Spotify's API all over again.
