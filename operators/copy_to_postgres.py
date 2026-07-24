@@ -18,6 +18,6 @@ def copy_expert_csv(file, columns=None):
             f"""
         COPY {file} {column_list} FROM stdin WITH CSV HEADER DELIMITER as ','
         """,
-            f"/opt/airflow/dags/spotify_data/{file}.csv",
+            f"/opt/airflow/dags/spotify/spotify_data/{file}.csv",
         )
         connection.commit()
