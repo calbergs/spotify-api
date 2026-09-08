@@ -81,7 +81,7 @@ def branch_on_payload(**context):
 
 def should_send_spotify_weekly_summary(**context):
     """Only send the weekly Spotify summary on Monday at 9am Central Time (scheduled or manual)."""
-    dt = context.get("data_interval_end") or context.get("logical_date") or context.get("execution_date")
+    dt = context.get("logical_date") or context.get("execution_date")
     if not dt:
         return False
     try:
